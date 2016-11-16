@@ -1,6 +1,7 @@
 package com.easytox.automation.steps;
 
 import com.easytox.automation.driver.DriverBase;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.openqa.selenium.By;
@@ -15,7 +16,8 @@ public class AddClientSteps {
     private String login = "lavanya1";
     private String password = "P@ssw0rd123";
 
-    public AddClientSteps() {
+    @Before
+    public void login(){
         DriverBase.instantiateDriverObject();
         driver = DriverBase.getDriver();
 
@@ -62,7 +64,6 @@ public class AddClientSteps {
         } catch (Exception e) {
             e.printStackTrace();
             driver.close();
-        } finally {
         }
     }
 
@@ -137,7 +138,7 @@ public class AddClientSteps {
         driver.close();
     }
 
-    public LabClient getNewClient() {
+    private LabClient getNewClient() {
         LabClient client = new LabClient();
 
         client.setAddress1("some address 1");
@@ -167,86 +168,86 @@ class LabClient {
     private String fax;
     private String email;
 
-    public LabClient() {
-    }
+     LabClient() {
+     }
 
-    public String getBusinessName() {
+     String getBusinessName() {
         return businessName;
     }
 
-    public void setBusinessName(String businessName) {
+     void setBusinessName(String businessName) {
         this.businessName = businessName;
     }
 
-    public String getAddress1() {
+     String getAddress1() {
         return address1;
     }
 
-    public void setAddress1(String address1) {
+     void setAddress1(String address1) {
         this.address1 = address1;
     }
 
-    public String getAddress2() {
+     String getAddress2() {
         return address2;
     }
 
-    public void setAddress2(String address2) {
+     void setAddress2(String address2) {
         this.address2 = address2;
     }
 
-    public long getZipCode() {
+     long getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(long zipCode) {
+     void setZipCode(long zipCode) {
         this.zipCode = zipCode;
     }
 
-    public String getCity() {
+     String getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+     void setCity(String city) {
         this.city = city;
     }
 
-    public String getState() {
+     String getState() {
         return state;
     }
 
-    public void setState(String state) {
+     void setState(String state) {
         this.state = state;
     }
 
-    public String getContactPerson() {
+     String getContactPerson() {
         return contactPerson;
     }
 
-    public void setContactPerson(String contactPerson) {
+     void setContactPerson(String contactPerson) {
         this.contactPerson = contactPerson;
     }
 
-    public String getContactNumber() {
+     String getContactNumber() {
         return contactNumber;
     }
 
-    public void setContactNumber(String contactNumber) {
+     void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
 
-    public String getFax() {
+     String getFax() {
         return fax;
     }
 
-    public void setFax(String fax) {
+     void setFax(String fax) {
         this.fax = fax;
     }
 
-    public String getEmail() {
+     String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+     void setEmail(String email) {
         this.email = email;
     }
 }
