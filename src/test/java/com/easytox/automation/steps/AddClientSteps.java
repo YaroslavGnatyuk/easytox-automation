@@ -1,6 +1,7 @@
 package com.easytox.automation.steps;
 
 import com.easytox.automation.driver.DriverBase;
+import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -134,7 +135,10 @@ public class AddClientSteps {
         String currentAddressFromDriver = driver.getCurrentUrl();
 
         assertEquals(true, currentAddress.equals(currentAddressFromDriver));
+    }
 
+    @After
+    public void closeDriver(){
         driver.close();
     }
 

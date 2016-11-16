@@ -31,8 +31,6 @@ public class DriverFactory {
     private final String proxyDetails = String.format("%s:%d", proxyHostname, proxyPort);
 
     public WebDriver getDriver() throws Exception {
-        System.out.println(System.getProperty("os.name") +  "   " + System.getProperty("os.arch"));
-
 
         if (null == webdriver) {
             Proxy proxy = null;
