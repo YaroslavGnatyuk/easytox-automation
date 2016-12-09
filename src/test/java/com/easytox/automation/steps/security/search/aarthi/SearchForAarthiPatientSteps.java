@@ -1,7 +1,6 @@
 package com.easytox.automation.steps.security.search.aarthi;
 
 import com.easytox.automation.driver.DriverBase;
-import com.easytox.automation.steps.security.search.PatientSearchException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Then;
@@ -30,6 +29,8 @@ public class SearchForAarthiPatientSteps {
     private List<String> westPatients;
     private List<String> zestPatients;
 
+    private List<String> junkData;
+
     private int patientsFromOtherLab = 0;
     private int patientsNotFoundFromQuestLab = 0;
 
@@ -44,7 +45,7 @@ public class SearchForAarthiPatientSteps {
 
         driver.navigate().to(easytoxAddress);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -64,7 +65,7 @@ public class SearchForAarthiPatientSteps {
     @Then("^User should be able to go to Physician page$")
     public void isItAbleToGoToPhysicianPage() {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
             driver.findElement(By.cssSelector(".account-area > li:nth-child(3) > a:nth-child(1)")).click();
             boolean isDisplayedPhysician = driver.findElement(By.cssSelector(".open > ul:nth-child(2) > li:nth-child(1) > a:nth-child(1)")).isDisplayed();
 
@@ -143,16 +144,17 @@ public class SearchForAarthiPatientSteps {
                 allPatients.add(elementsEven.get(i).findElements(By.cssSelector("td")).get(1).getText());
             }
 
+            allPatients.removeAll(junkData);        //filter for junk data
             allPatients.removeAll(questPatients);
 
-            if (!allPatients.isEmpty()) {
+            /*if (!allPatients.isEmpty()) {
                 throw new PatientSearchException("There should be only patients from QuestLab \n" +
                         "These patients shouldn't be in the list:\n" +
                         allPatients.stream().collect(Collectors.joining(",\n")));
-            }
-            /*assertEquals(allPatients.stream().collect(Collectors.joining(",")),
-                    true, allPatients.isEmpty());*/
-        } catch (InterruptedException | PatientSearchException e) {
+            }*/
+            assertEquals(allPatients.stream().collect(Collectors.joining(",")),
+                    true, allPatients.isEmpty());
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -178,7 +180,7 @@ public class SearchForAarthiPatientSteps {
     }
 
     @Then("^Results should be displayed as for the search made$")
-    public void resultSearchExistPatients(){
+    public void resultSearchExistPatients() {
         assertEquals("All user should be to found, so 'patientsNotFoundFromQuestLab' should be to equal zero",
                 true, patientsNotFoundFromQuestLab == 0);
     }
@@ -190,12 +192,12 @@ public class SearchForAarthiPatientSteps {
     }
 
     @Then("^No results should be displayed when searched with the patients other than Quest Lab Client Patients$")
-    public void resultSearchForPatientsFromOtherLabs(){
+    public void resultSearchForPatientsFromOtherLabs() {
         assertEquals("No one user should be to found from other labs, so 'patientsFromOtherLab' shouldn't be",
                 true, patientsFromOtherLab == 0);
     }
 
-    public void search(List<String> patients){
+    public void search(List<String> patients) {
         for (String patient : patients) {
             driver.findElement(By.cssSelector("input.input-sm")).sendKeys(patient);
 
@@ -206,8 +208,10 @@ public class SearchForAarthiPatientSteps {
                 driver.findElement(By.cssSelector("input.input-sm")).clear();
 
             } catch (NoSuchElementException e) {            //If we have this exception it means that patient was found
-                patientsFromOtherLab++;
-                log.info("Patient found from other lab: " + patient);
+                if(!junkData.contains(patient)){            //filter for junk data
+                    patientsFromOtherLab++;
+                    log.info("Patient found from other lab: " + patient);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 driver.close();
@@ -238,6 +242,14 @@ public class SearchForAarthiPatientSteps {
                 "Kayal Sally", "Kaiden Wand", "Keira Sink", "Krishna Olive",
                 "Logan Matt", "Levin Tirey", "Lewis Port", "Lacey Waste",
                 "Mirchi Kite", "Mason ferg", "Megan Force", "Maisie Xavior"
+        }).collect(Collectors.toList());
+
+        junkData = Stream.of(new String[]{
+                "PtB QABBatman","PtBbb QABBatman","Raja Raman lastName","PtBb QABBatman",
+                "PtA Q QABant","PtC QACatman","PtCccc QACatman","PtCcc QACatman",
+                "Red vandit lastName","Ronnie Hebrew lastName","PtAaa QABAnt","PtCc QACatman",
+                "Riley william lastName","PtBbbb QABBatman","PtAa QABAnt","PtAaaa QABAnt",
+                "Raja Raman","madhu madhu"
         }).collect(Collectors.toList());
     }
 }

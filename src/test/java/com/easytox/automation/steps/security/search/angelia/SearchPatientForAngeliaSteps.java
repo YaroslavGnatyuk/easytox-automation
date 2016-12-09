@@ -1,7 +1,6 @@
 package com.easytox.automation.steps.security.search.angelia;
 
 import com.easytox.automation.driver.DriverBase;
-import com.easytox.automation.steps.security.search.PatientSearchException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Then;
@@ -34,6 +33,7 @@ public class SearchPatientForAngeliaSteps {
     private int patientsNotFoundFromQuestAndWestLab = 0;
 
     private Logger log = Logger.getLogger(SearchPatientForAngeliaSteps.class);
+    private List<String> junkData;
 
     @Before
     public void gotoEasytoxAutomation() {
@@ -64,7 +64,7 @@ public class SearchPatientForAngeliaSteps {
     @Then("^User should be able to go to Physician page$")
     public void isItAbleToGoToPhysicianPage() {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
             driver.findElement(By.cssSelector(".account-area > li:nth-child(3) > a:nth-child(1)")).click();
             boolean isDisplayedPhysician = driver.findElement(By.cssSelector(".open > ul:nth-child(2) > li:nth-child(1) > a:nth-child(1)")).isDisplayed();
 
@@ -143,18 +143,19 @@ public class SearchPatientForAngeliaSteps {
                 allPatients.add(elementsEven.get(i).findElements(By.cssSelector("td")).get(1).getText());
             }
 
+            allPatients.removeAll(junkData); //filter for junk data
             allPatients.removeAll(questPatients);
             allPatients.removeAll(westPatients);
 
-            if (!allPatients.isEmpty()) {
+            /*if (!allPatients.isEmpty()) {
                 throw new PatientSearchException("There should be only patients from\n" +
                         "QuestLab and belongs Angelia in WestLab\n" +
                         "These patients shouldn't be in the list:\n" +
                         allPatients.stream().collect(Collectors.joining(",\n")));
-            }
-            /*assertEquals(allPatients.stream().collect(Collectors.joining(",")),
-                    true, allPatients.isEmpty());*/
-        } catch (InterruptedException | PatientSearchException e) {
+            }*/
+            assertEquals(allPatients.stream().collect(Collectors.joining(",")),
+                    true, allPatients.isEmpty());
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -202,8 +203,10 @@ public class SearchPatientForAngeliaSteps {
                 driver.findElement(By.cssSelector("input.input-sm")).clear();
 
             } catch (NoSuchElementException e) {            //If we have this exception it means that patient was found
-                patientsFromOtherLab++;
-                log.info("Patient found from other lab: " + patient);
+                if(!junkData.contains(patient)){            //filter for junk data
+                    patientsFromOtherLab++;
+                    log.info("Patient found from other lab: " + patient);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -239,6 +242,14 @@ public class SearchPatientForAngeliaSteps {
                 "Kayal Sally", "Kaiden Wand", "Keira Sink", "Krishna Olive",
                 "Logan Matt", "Levin Tirey", "Lewis Port", "Lacey Waste",
                 "Mirchi Kite", "Mason ferg", "Megan Force", "Maisie Xavior"
+        }).collect(Collectors.toList());
+
+        junkData = Stream.of(new String[]{
+                "PtB QABBatman","PtBbb QABBatman","Raja Raman lastName","PtBb QABBatman",
+                "PtA Q QABant","PtC QACatman","PtCccc QACatman","PtCcc QACatman",
+                "Red vandit lastName","Ronnie Hebrew lastName","PtAaa QABAnt","PtCc QACatman",
+                "Riley william lastName","PtBbbb QABBatman","PtAa QABAnt","PtAaaa QABAnt",
+                "Raja Raman","madhu madhu"
         }).collect(Collectors.toList());
     }
 }
