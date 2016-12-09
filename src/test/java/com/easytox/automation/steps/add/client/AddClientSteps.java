@@ -1,4 +1,4 @@
-package com.easytox.automation.steps;
+package com.easytox.automation.steps.add.client;
 
 import com.easytox.automation.driver.DriverBase;
 import cucumber.api.java.After;

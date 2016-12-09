@@ -1,0 +1,243 @@
+package com.easytox.automation.steps.security.search.aarthi;
+
+import com.easytox.automation.driver.DriverBase;
+import com.easytox.automation.steps.security.search.PatientSearchException;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.testng.AssertJUnit.assertEquals;
+
+public class SearchForAarthiPatientSteps {
+    private WebDriver driver;
+    private static final String easytoxAddress = "http://bmtechsol.com:8080/easytox/";
+    private static final String patientsPageAddress = "http://bmtechsol.com:8080/easytox/patient/patientlist";
+
+    private List<String> questPatients;
+    private List<String> westPatients;
+    private List<String> zestPatients;
+
+    private int patientsFromOtherLab = 0;
+    private int patientsNotFoundFromQuestLab = 0;
+
+    private Logger log = Logger.getLogger(SearchForAarthiPatientSteps.class);
+
+    @Before
+    public void gotoEasytoxAutomation() {
+        initPatients();
+
+        DriverBase.instantiateDriverObject();
+        driver = DriverBase.getDriver();
+
+        driver.navigate().to(easytoxAddress);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @When("^User login with the physician \"([^\"]*)\" and password \"([^\"]*)\"$")
+    public void login(String usr, String psw) {
+        try {
+            driver.findElement(By.name("j_username")).sendKeys(usr);
+            driver.findElement(By.name("j_password")).sendKeys(psw);
+            driver.findElement(By.cssSelector("button.btn.btn-md.btn-primary")).click();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Then("^User should be able to go to Physician page$")
+    public void isItAbleToGoToPhysicianPage() {
+        try {
+            Thread.sleep(1000);
+            driver.findElement(By.cssSelector(".account-area > li:nth-child(3) > a:nth-child(1)")).click();
+            boolean isDisplayedPhysician = driver.findElement(By.cssSelector(".open > ul:nth-child(2) > li:nth-child(1) > a:nth-child(1)")).isDisplayed();
+
+            assertEquals("User should be able to go to Physician page", true, isDisplayedPhysician);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @When("^User clicks on Patient from menu$")
+    public void gotoPatientPage() {
+        driver.findElement(By.cssSelector(".open > ul:nth-child(2) > li:nth-child(1) > a:nth-child(1)")).click();
+    }
+
+    @Then("^User should be navigated to Patients list page$")
+    public void isItPatientsPage() {
+        String patientsPageAddressFromDriver = driver.getCurrentUrl();
+
+        assertEquals("Addresses must be equals", true,
+                patientsPageAddress.equalsIgnoreCase(patientsPageAddressFromDriver));
+    }
+
+    @When("^Check for the patients list$")
+    public void openPatientList() {
+        driver.navigate().to(patientsPageAddress);
+    }
+
+    @Then("^All patients from Quest lab should be displayed$")
+    public void checkDisplayedPatients() {
+        try {
+            new Select(driver.findElement(By.name("example_length"))).selectByVisibleText("All");
+
+            Thread.sleep(1000);
+
+            Set<String> allPatients = new HashSet<>();
+            List<WebElement> elementsOdd = driver.findElements(By.cssSelector("tr.odd"));
+            List<WebElement> elementsEven = driver.findElements(By.cssSelector("tr.even"));
+
+            for (int i = 0; i < elementsOdd.size(); i++) {
+                allPatients.add(elementsOdd.get(i).findElements(By.cssSelector("td")).get(1).getText());
+            }
+
+            for (int i = 0; i < elementsEven.size(); i++) {
+                allPatients.add(elementsEven.get(i).findElements(By.cssSelector("td")).get(1).getText());
+            }
+
+            assertEquals("Patients from quest lab should be in list"
+                    , true, allPatients.containsAll(questPatients));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @When("^Check for the other patients$")
+    public void reopenPatientList() {
+        driver.navigate().to(patientsPageAddress);
+    }
+
+    @Then("^There should be only patients from QuestLab$")
+    public void checkPatientsList() {
+        try {
+            new Select(driver.findElement(By.name("example_length"))).selectByVisibleText("All"); //I choose "All" patients on one list
+
+            Thread.sleep(1000);
+
+            Set<String> allPatients = new HashSet<>();
+
+            List<WebElement> elementsOdd = driver.findElements(By.cssSelector("tr.odd"));    //I get all patients name from line .odd
+            List<WebElement> elementsEven = driver.findElements(By.cssSelector("tr.even"));
+
+            for (int i = 0; i < elementsOdd.size(); i++) {
+                allPatients.add(elementsOdd.get(i).findElements(By.cssSelector("td")).get(1).getText());
+            }
+
+            for (int i = 0; i < elementsEven.size(); i++) {
+                allPatients.add(elementsEven.get(i).findElements(By.cssSelector("td")).get(1).getText());
+            }
+
+            allPatients.removeAll(questPatients);
+
+            if (!allPatients.isEmpty()) {
+                throw new PatientSearchException("There should be only patients from QuestLab \n" +
+                        "These patients shouldn't be in the list:\n" +
+                        allPatients.stream().collect(Collectors.joining(",\n")));
+            }
+            /*assertEquals(allPatients.stream().collect(Collectors.joining(",")),
+                    true, allPatients.isEmpty());*/
+        } catch (InterruptedException | PatientSearchException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @When("^User search for all patients from Quest lab$")
+    public void searchExistPatients() {
+        for (String patient : questPatients) {
+            driver.findElement(By.cssSelector("input.input-sm")).sendKeys(patient);
+
+            try {
+
+                driver.findElement(By.cssSelector(".odd > td:nth-child(2)")).getText(); //If I found this element (field with name of patient) it means
+                Thread.sleep(300);    // that patient was found, else we have exception NoSuchElementException
+                driver.findElement(By.cssSelector("input.input-sm")).clear();
+
+            } catch (NoSuchElementException e) {            //If we have this exception it means that patient wasn't found
+                patientsNotFoundFromQuestLab++;
+                log.info("Patient not found: " + patient);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Then("^Results should be displayed as for the search made$")
+    public void resultSearchExistPatients(){
+        assertEquals("All user should be to found, so 'patientsNotFoundFromQuestLab' should be to equal zero",
+                true, patientsNotFoundFromQuestLab == 0);
+    }
+
+    @When("^User search for the patients from other lab$")
+    public void searchPatientFromOtherLab() {
+        search(westPatients);
+        search(zestPatients);
+    }
+
+    @Then("^No results should be displayed when searched with the patients other than Quest Lab Client Patients$")
+    public void resultSearchForPatientsFromOtherLabs(){
+        assertEquals("No one user should be to found from other labs, so 'patientsFromOtherLab' shouldn't be",
+                true, patientsFromOtherLab == 0);
+    }
+
+    public void search(List<String> patients){
+        for (String patient : patients) {
+            driver.findElement(By.cssSelector("input.input-sm")).sendKeys(patient);
+
+            try {
+
+                driver.findElement(By.cssSelector(".dataTables_empty")).getText(); //If I found this element (field with name of patient) it means
+                Thread.sleep(300);    // that patient not found, else we have exception NoSuchElementException
+                driver.findElement(By.cssSelector("input.input-sm")).clear();
+
+            } catch (NoSuchElementException e) {            //If we have this exception it means that patient was found
+                patientsFromOtherLab++;
+                log.info("Patient found from other lab: " + patient);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                driver.close();
+            }
+        }
+    }
+
+    @After
+    public void afterAll() {
+        driver.close();
+    }
+
+    private void initPatients() {
+        questPatients = Stream.of(new String[]{"Raja Raman", "Red Vandit", "Riley William", "Ronnie Hebrew",
+                "Patrik Latin", "Paige Wandel", "Poppy Snider", "Penny Greek"
+                , "Sally Debri", "Sebastin Tink", "Sienna Avany", "Summer Junk",
+                "Quina Samer", "Qiang Tiny", "Quang Mint", "Qillq Brad"
+        }).collect(Collectors.toList());
+
+        westPatients = Stream.of(new String[]{"Emma Girl", "Erica Falen", "Ethen Hebrew", "Edward Joseph",
+                "Franky Italy", "Farrah Sara", "Florence King", "Finley Celtic",
+                "Gracie Emma", "Greger Welsh", "Gabriel Dash", "Gabby Unite",
+                "Henry Olidy", "Harvey Utah", "Holley Hoger", "Heidi Zaby"
+        }).collect(Collectors.toList());
+
+        zestPatients = Stream.of(new String[]{
+                "Jayden Grack", "Julia Potter", "Jacob Penny", "James Vict",
+                "Kayal Sally", "Kaiden Wand", "Keira Sink", "Krishna Olive",
+                "Logan Matt", "Levin Tirey", "Lewis Port", "Lacey Waste",
+                "Mirchi Kite", "Mason ferg", "Megan Force", "Maisie Xavior"
+        }).collect(Collectors.toList());
+    }
+}
