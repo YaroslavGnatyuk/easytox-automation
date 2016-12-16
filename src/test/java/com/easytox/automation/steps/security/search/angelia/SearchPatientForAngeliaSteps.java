@@ -68,7 +68,7 @@ public class SearchPatientForAngeliaSteps {
             driver.findElement(By.cssSelector(".account-area > li:nth-child(3) > a:nth-child(1)")).click();
             boolean isDisplayedPhysician = driver.findElement(By.cssSelector(".open > ul:nth-child(2) > li:nth-child(1) > a:nth-child(1)")).isDisplayed();
 
-            assertEquals("User should be able to go to Physician page", true, isDisplayedPhysician);
+            assertEquals("Case should be able to go to Physician page", true, isDisplayedPhysician);
         } catch (Exception e) {
             e.printStackTrace();
         }
