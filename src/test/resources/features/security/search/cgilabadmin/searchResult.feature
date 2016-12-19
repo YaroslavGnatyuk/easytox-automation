@@ -18,11 +18,11 @@ Feature: Security framework test scenarios
     When Verify that for a case with Status as Finalized, a edit icon is displayed against the case. Click edit icon.
     Then Two radio options are displayed Case Correct and Case Revise
 
-#    When Select Case Correct option.
-#    Then Case screen should be displayed for editing. Correct option.
-#
-#    When Select Case Revise option.
-#    Then Case screen should be displayed for editing. Revise option.
+    When Select Case Correct option.
+    Then Case screen should be displayed for editing. Correct option.
+
+    When Select Case Revise option.
+    Then Case screen should be displayed for editing. Revise option.
 
     When Verify the Report column for finalized cases.
     Then A PDF icon for viewing the report should be displayed. Upon clicking the icon, case report should be displayed.

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 public class SearchResultSteps {
     private WebDriver driver;
-    private static final String easytoxAddress = "http://bmtechsol.com:8080/easytox/";
+    private static final String easyToxAddress = "http://bmtechsol.com:8080/easytox/";
     private static final String casePage = "http://bmtechsol.com:8080/easytox/caseOrder/list";
     private List<Case> testData;
 
@@ -35,7 +35,7 @@ public class SearchResultSteps {
         try {
             DriverBase.instantiateDriverObject();
             driver = DriverBase.getDriver();
-            driver.navigate().to(easytoxAddress);
+            driver.navigate().to(easyToxAddress);
             driver.manage().window().maximize();
 
             testData = TestData.getCases();
@@ -148,7 +148,7 @@ public class SearchResultSteps {
     @Then("^Case screen should be displayed for editing$")
     public void checkScreen() {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(3000);
             String currentPage = driver.findElement(By.cssSelector(WElement.pageHeaderTitle)).getText(); // I read name of the page from header-title
             log.info(currentPage);
             assertEquals(true, currentPage.equals("Update Case"));
@@ -167,7 +167,7 @@ public class SearchResultSteps {
             new Select(driver.findElement(By.cssSelector(WElement.statusFieldSearch))).selectByVisibleText("InProcess");
             Thread.sleep(300);
             driver.findElement(By.cssSelector(WElement.searchButton)).click();
-            Thread.sleep(1000);
+            Thread.sleep(1500);
 
             boolean isDeleteIconShowed = driver.findElement(By.cssSelector(WElement.deleteIconInMyTable)).isDisplayed();
 
@@ -184,16 +184,24 @@ public class SearchResultSteps {
         try {
             String caseAccessionNumber = driver.findElement(By.cssSelector(WElement.caseNumberRowInMyTable)).getText();
 
+            driver.findElement(By.cssSelector(WElement.filterField)).sendKeys(caseAccessionNumber);
+            Thread.sleep(100);
+            String statusBefore = driver.findElement(By.cssSelector(WElement.statusOfCaseMainTable)).getText();
+
             driver.findElement(By.cssSelector(WElement.deleteIconInMyTable)).click();
-            Thread.sleep(1000);
+            Thread.sleep(100);
             driver.findElement(By.cssSelector(WElement.confirmationDeletingInMyTable)).click();
             driver.findElement(By.cssSelector(WElement.caseNumberFieldSearch)).sendKeys(caseAccessionNumber);
             Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.searchButton)).click();
             Thread.sleep(2000);
 
-            int amountOfFieldsInTable = driver.findElements(By.cssSelector(WElement.rowInMyTable)).size();
-            assertEquals(true, amountOfFieldsInTable == 1);
+            driver.findElement(By.cssSelector(WElement.filterField)).sendKeys(caseAccessionNumber);
+            Thread.sleep(100);
+            String statusAfter = driver.findElement(By.cssSelector(WElement.statusOfCaseMainTable)).getText();
+
+            log.info("status before ->" + statusBefore + ", status after -> " + statusAfter);
+            assertEquals(true, statusBefore.equals("processing") && statusAfter.equals("finalized"));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -263,8 +271,6 @@ public class SearchResultSteps {
             String currentPage = driver.findElement(By.cssSelector(WElement.pageHeaderTitle)).getText(); // I read name of the page from header-title
             log.info(currentPage);
             assertEquals(true, currentPage.equals("Correct Case"));
-
-            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -294,13 +300,9 @@ public class SearchResultSteps {
     public void checkDisplayForEditingAfterChooseRevise() {
         try {
             Thread.sleep(1000);
-
             String currentPage = driver.findElement(By.cssSelector(WElement.pageHeaderTitle)).getText(); // I read name of the page from header-title
             log.info(currentPage);
-            Thread.sleep(5000);
             assertEquals(true, currentPage.equals("Revise Case"));
-
-            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

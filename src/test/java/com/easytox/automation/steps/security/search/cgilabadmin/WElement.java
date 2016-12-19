@@ -4,11 +4,12 @@ package com.easytox.automation.steps.security.search.cgilabadmin;
  * Created by yroslav on 12/16/16.
  */
 public interface WElement {
-    /*for result search cases*/
+    /*for result search cases and case search*/
     String searchButton = "#searchbtn";
     String caseNumberRowInMyTable = "#myTable > tr:nth-child(2) > td:nth-child(1) > a:nth-child(1)";
     String rowInMyTable = "#myTable > tr";
-
+    String filterField = "#caseorder_filter > label > input";
+    String statusOfCaseMainTable = "#caseorder > tbody > tr > td:nth-child(7)";
     String caseNumberFieldSearch = "div.row:nth-child(3) > div:nth-child(1) > input:nth-child(1)";
     String medicalRecordNumberFieldSearch = "div.row:nth-child(3) > div:nth-child(2) > input:nth-child(1)";
     String firstNameFieldSearch = "div.row:nth-child(1) > div:nth-child(1) > input:nth-child(1)";

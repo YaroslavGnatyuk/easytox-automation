@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 public class SearchDetailSteps {
     private WebDriver driver;
 
-    private static final String easytoxAddress = "http://bmtechsol.com:8080/easytox/";
+    private static final String easyToxAddress = "http://bmtechsol.com:8080/easytox/";
     private static final String casePage = "http://bmtechsol.com:8080/easytox/caseOrder/list";
     private static final String createNewCasePage = "http://bmtechsol.com:8080/easytox/caseOrder/create";
     private static final String detailList = "http://bmtechsol.com:8080/easytox/caseOrder/detaillist";
@@ -45,7 +45,7 @@ public class SearchDetailSteps {
             DriverBase.instantiateDriverObject();
             driver = DriverBase.getDriver();
             driver.manage().window().maximize();
-            driver.navigate().to(easytoxAddress);
+            driver.navigate().to(easyToxAddress);
 
             Thread.sleep(1500);
         } catch (InterruptedException e) {
@@ -297,8 +297,6 @@ public class SearchDetailSteps {
             String currentPage = driver.findElement(By.cssSelector(WElement.pageHeaderTitle)).getText(); // I read name of the page from header-title
             log.info(currentPage);
             assertTrue(currentPage.equals("Correct Case"));
-
-            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -332,8 +330,6 @@ public class SearchDetailSteps {
             String currentPage = driver.findElement(By.cssSelector(WElement.pageHeaderTitle)).getText(); // I read name of the page from header-title
             log.info(currentPage);
             assertTrue(currentPage.equals("Revise Case"));
-
-            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

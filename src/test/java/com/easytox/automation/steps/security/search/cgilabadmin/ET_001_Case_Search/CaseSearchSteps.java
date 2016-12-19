@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 public class CaseSearchSteps {
     private WebDriver driver;
-    private static final String easytoxAddress = "http://bmtechsol.com:8080/easytox/";
+    private static final String easyToxAddress = "http://bmtechsol.com:8080/easytox/";
     private List<Case> testData;
 
     private Logger log = Logger.getLogger(CaseSearchSteps.class);
@@ -40,7 +40,7 @@ public class CaseSearchSteps {
     @Given("^User login with the physician \"([^\"]*)\" and password \"([^\"]*)\"$$")
     public void loginToEasytox(String usr, String psw) {
         try {
-            driver.navigate().to(easytoxAddress);
+            driver.navigate().to(easyToxAddress);
             Thread.sleep(500);
             driver.findElement(By.name("j_username")).sendKeys(usr);
             driver.findElement(By.name("j_password")).sendKeys(psw);
@@ -71,8 +71,8 @@ public class CaseSearchSteps {
             List<WebElement> fields = driver.findElements(By.cssSelector(WElement.rowInMyTable));  //I got all rows from table
             fields.remove(0);   //I removed first row with descriptions for columns
 
-            for (WebElement element : fields) {
-                String patientsFirstName = element.getText().split("\n")[2].trim().split(" ")[0]; // I selected patients name only
+            for (WebElement field : fields) {
+                String patientsFirstName = field.getText().split("\n")[2].trim().split(" ")[0]; // I selected patients name only
                 assertEquals(true, patientsFirstName.equalsIgnoreCase(testData.get(0).getFirstName()));
             }
         } catch (InterruptedException e) {
