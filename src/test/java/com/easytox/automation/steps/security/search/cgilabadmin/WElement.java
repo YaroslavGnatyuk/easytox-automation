@@ -1,8 +1,10 @@
 package com.easytox.automation.steps.security.search.cgilabadmin;
 
 /**
- * Created by yroslav on 12/16/16.
- */
+ * I hold here web elements for test -> Search Cases -> ET_001_Case Search,
+ * ET_002_Result Search and ET_003_Detail Search
+ **/
+
 public interface WElement {
     /*for result search cases and case search*/
     String searchButton = "#searchbtn";
