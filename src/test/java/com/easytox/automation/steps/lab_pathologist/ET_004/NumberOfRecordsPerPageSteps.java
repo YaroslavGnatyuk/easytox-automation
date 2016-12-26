@@ -117,6 +117,7 @@ public class NumberOfRecordsPerPageSteps {
                 List<WebElement> webElements = driver.findElements(By.cssSelector(WElement.oneRowInMainTable));
                 assertTrue(webElements.size() <= Integer.valueOf(selectValue));
                 log.info(selectValue);
+
                 break;
             }
 
@@ -125,6 +126,7 @@ public class NumberOfRecordsPerPageSteps {
                 List<WebElement> webElements = driver.findElements(By.cssSelector(WElement.oneRowInMainTable));
                 assertTrue(webElements.size() <= Integer.valueOf(selectValue));
                 log.info(selectValue);
+
                 break;
             }
 
@@ -148,15 +150,15 @@ public class NumberOfRecordsPerPageSteps {
             case "All":{
                 new Select(driver.findElement(By.cssSelector(WElement.pathologistPerPage))).selectByVisibleText(selectValue);
                 List<WebElement> webElements = driver.findElements(By.cssSelector(WElement.oneRowInMainTable));
-                String amountOfPathologist = driver.findElement(By.cssSelector(WElement.amountOfPathologists)).getText().split(" ")[5];
-                assertTrue(webElements.size() == Integer.valueOf(amountOfPathologist));
+                String amountOfPathologists = driver.findElement(By.cssSelector(WElement.amountOfPathologists)).getText().split(" ")[5];
+                assertTrue(webElements.size() == Integer.valueOf(amountOfPathologists));
                 log.info(selectValue);
 
                 break;
             }
 
             default:{
-                log.info("There is error in select");
+                log.info("There is error in select case");
             }
         }
     }
