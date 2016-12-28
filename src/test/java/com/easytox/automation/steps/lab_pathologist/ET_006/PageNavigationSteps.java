@@ -30,14 +30,14 @@ public class PageNavigationSteps {
     public void init() {
         DriverBase.instantiateDriverObject();
         driver = DriverBase.getDriver();
-        driver.navigate().to(easyToxAddress);
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(4, TimeUnit.SECONDS);
     }
 
     @Given("^User login with the physician \"([^\"]*)\" and password \"([^\"]*)\"$$")
     public void loginToEasyTox(String usr, String psw) {
         try {
+            driver.navigate().to(easyToxAddress);
             driver.findElement(By.name(WElement.loginPageFieldName)).sendKeys(usr);
             driver.findElement(By.name(WElement.loginPagePasswordField)).sendKeys(psw);
             driver.findElement(By.cssSelector(WElement.loginPageLoginButton)).click();
