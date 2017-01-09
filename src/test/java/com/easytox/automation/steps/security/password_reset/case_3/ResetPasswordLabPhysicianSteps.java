@@ -44,8 +44,6 @@ public class ResetPasswordLabPhysicianSteps {
     public void checkCurrentScreen() {
         String headerTextShouldBe = "Sign In";
         String headerTextWeHave = driver.findElement(By.cssSelector(WElement.panelHeading)).getText();
-//        log.info(headerTextShouldBe + "\n");
-//        log.info(headerTextWeHave + "\n");
         assertTrue(headerTextWeHave.equals(headerTextShouldBe));
     }
 
@@ -145,7 +143,6 @@ public class ResetPasswordLabPhysicianSteps {
         if (isLabClientExist) {
             return;
         } else {
-            //todo I want to have reset password screen here
             getLabClient(labClient).findElement(By.cssSelector(WElement.resetUserPasswordButton)).click();
         }
     }
@@ -273,8 +270,6 @@ public class ResetPasswordLabPhysicianSteps {
             String autoPopulatedUsernameWeHave = driver
                     .findElement(By.cssSelector(WElement.changePasswordPage_usernameField))
                     .getAttribute("value");
-//            log.info(autoPopulatedUsername + "\n");
-//            log.info(autoPopulatedUsernameWeHave + "\n");
             assertTrue(autoPopulatedUsername.equals(autoPopulatedUsernameWeHave));
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -426,7 +421,6 @@ public class ResetPasswordLabPhysicianSteps {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 }

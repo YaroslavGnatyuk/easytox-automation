@@ -1,10 +1,13 @@
-Feature: Lab pathologist
+Feature: Security framework test
 
   Scenario Outline: Verify the page navigation
-    Given User login with the physician "cgilabadmin" and password "Welcome@123"
 
-    When Select Settings -> Lab Pathologist.
-    Then Lab Pathologist List screen is displayed.
+    When Login to Easytox with "SNLabAdmin" and "Test@1234" credentials.
+    Then User login should be successful.
+
+    When Click "Pending Password Requests" link.
+    And Select "See All Requests".
+    Then Password Request List" screen should be displayed.
 
     When Navigate back and forth by selecting page numbers <button>
     Then User should be navigate to the selected page<button>

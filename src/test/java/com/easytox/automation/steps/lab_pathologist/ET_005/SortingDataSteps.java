@@ -87,9 +87,9 @@ public class SortingDataSteps {
 
         sortedColumns = getTextOfOneColumnFromTableBody(column);
         if (column.equals("Medicaid Num") || column.equals("Medicare Num")) {
-            Collections.sort(unsortedColumns, new SortInteger()); //I imitate sorting by column in table
+            Collections.sort(unsortedColumns, new SortAscendInteger()); //I imitate sorting by column in table
         } else {
-            Collections.sort(unsortedColumns, new SortIgnoreCase()); //I imitate sorting by column in table
+            Collections.sort(unsortedColumns, new SortAscendIgnoreCase()); //I imitate sorting by column in table
         }
     }
 
@@ -111,7 +111,11 @@ public class SortingDataSteps {
         elements.stream().filter(element -> element.getText().equals(column)).forEach(WebElement::click); //I make sorting by column in table on view
 
         sortedColumns = getTextOfOneColumnFromTableBody(column);
-        Collections.reverse(unsortedColumns);   //I imitate sorting by column in table
+        if (column.equals("Medicaid Num") || column.equals("Medicare Num")) {
+            Collections.sort(unsortedColumns, new SortDescendInteger()); //I imitate sorting by column in table
+        } else {
+            Collections.sort(unsortedColumns, new SortDescendIgnoreCase()); //I imitate sorting by column in table
+        }
     }
 
     @Then("^Records should be displayed based on the descending order of the selected field$")
@@ -185,7 +189,7 @@ public class SortingDataSteps {
         return elements.stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
-    private class SortIgnoreCase implements Comparator<Object> {
+    private class SortAscendIgnoreCase implements Comparator<Object> { // I make sorting ignore case because column in table sorts in the same way
         @Override
         public int compare(Object o1, Object o2) {
             String s1 = (String) o1;
@@ -194,7 +198,19 @@ public class SortingDataSteps {
         }
     }
 
-    private class SortInteger implements Comparator<Object> {
+    private class SortDescendIgnoreCase implements Comparator<Object> { // I make sorting ignore case because column in table sorts in the same way
+        @Override
+        public int compare(Object o1, Object o2) {
+            String s1 = (String) o1;
+            String s2 = (String) o2;
+            int resultOfCompering = s1.toLowerCase().compareTo(s2.toLowerCase());
+            if(resultOfCompering > 0) return -1;
+            if(resultOfCompering < 0) return 1;
+            return 0;
+        }
+    }
+
+    private class SortAscendInteger implements Comparator<Object> {
         @Override
         public int compare(Object o1, Object o2) {
             String s1 = (String) o1;
@@ -206,6 +222,27 @@ public class SortingDataSteps {
             Integer i1 = Integer.valueOf(s1);
             Integer i2 = Integer.valueOf(s2);
             return i1.compareTo(i2);
+        }
+    }
+
+    private class SortDescendInteger implements Comparator<Object> {
+        @Override
+        public int compare(Object o1, Object o2) {
+            String s1 = (String) o1;
+            String s2 = (String) o2;
+
+            if (s1.isEmpty() || s2.isEmpty())       //If string is empty I put their in the end of the list
+                return -1;
+
+            Integer i1 = Integer.valueOf(s1);
+            Integer i2 = Integer.valueOf(s2);
+
+            int resultOfCompering = i1.compareTo(i2);
+
+            if(resultOfCompering > 0) return -1;
+            if(resultOfCompering < 0) return 1;
+
+            return 0;
         }
     }
 

@@ -15,6 +15,10 @@ interface WElement {
 
     String paginationPrevButton = "#example_paginate > ul > li.prev > a";
     String paginationNextButton = "#example_paginate > ul > li.next > a";
+    String paginationFirstPage = "#example_paginate > ul > li:nth-child(2) > a";
+    String paginationSecondPage = "#example_paginate > ul > li:nth-child(3) > a";
+    String paginationThirdPage = "#example_paginate > ul > li:nth-child(4) > a";
+
     String pagination = "#example_paginate > ul > li";
     String thisIsActivePage = "#example_paginate > ul > li.active > a";
     String bottomTextMessage = "#example_info";

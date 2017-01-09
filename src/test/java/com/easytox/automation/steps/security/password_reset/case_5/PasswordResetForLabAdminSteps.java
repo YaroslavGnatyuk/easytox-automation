@@ -1,4 +1,4 @@
-package com.easytox.automation.steps.security.password_reset.case_4;
+package com.easytox.automation.steps.security.password_reset.case_5;
 
 import com.easytox.automation.driver.DriverBase;
 import cucumber.api.java.After;
@@ -12,26 +12,21 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
-public class PasswordResetLabPathologist {
-    private WebDriver driver;
-    private Logger log = Logger.getLogger(PasswordResetLabPathologist.class);
-    private static final String easyToxLoginPage = "http://bmtechsol.com:8080/easytox/";
-    private static final String currentLabPage = "http://bmtechsol.com:8080/easytox/caseOrder/list"; //This address we have after successful logging
-    private static final String forgotPasswordPage = "http://bmtechsol.com:8080/easytox/actionItem/forgotPassword";
-    private static final String resetPasswordPage = "http://bmtechsol.com:8080/easytox/actionItem/resetPassword";
-    private static final String validEmailAddress = "someEmail@gmail.com";
 
-    private String dateForSearch = null;
-    private WebElement allLabClientData = null;
+public class PasswordResetForLabAdminSteps {
+    private WebDriver driver;
+    private Logger log = Logger.getLogger(PasswordResetForLabAdminSteps.class);
+    private static final String easyToxAddress = "http://bmtechsol.com:8080/easytox/";
+    private static final String pageAfterSuccessfulLogging = "http://bmtechsol.com:8080/easytox/lab/list"; //This address we have after successful logging
+    private static final String forgotPasswordScreenAddress = "http://bmtechsol.com:8080/easytox/actionItem/forgotPassword";
+    private static final String validEmailAddress = "someEmail@gmail.com";
 
     @Before
     public void init() {
@@ -50,60 +45,57 @@ public class PasswordResetLabPathologist {
     public void checkCurrentScreen() {
         String headerTextShouldBe = "Sign In";
         String headerTextWeHave = driver.findElement(By.cssSelector(WElement.panelHeading)).getText();
-//        log.info(headerTextShouldBe + "\n");
-//        log.info(headerTextWeHave + "\n");
         assertTrue(headerTextWeHave.equals(headerTextShouldBe));
     }
 
     @When("^Click \"Click here\" link on Forgot Password.$")
     public void gotToForgotPasswordPage() {
-        driver.navigate().to(easyToxLoginPage);
+        driver.navigate().to(easyToxAddress);
         driver.findElement(By.linkText("Click here")).click();
     }
 
     @Then("^Forgot Password screen should be displayed.$")
-    public void checkForgotPasswordPage(){
+    public void checkForgotPasswordPage() {
         String currentPage = driver.getCurrentUrl();
-        assertTrue(currentPage.equals(forgotPasswordPage));
+        assertTrue(currentPage.equals(forgotPasswordScreenAddress));
     }
 
     @When("^Enter Username as \"([^\"]*)\", valid email address and click \"Send my Password\" button.$")
-    public void sendRequestForRecoveryPassword(String validUsername){
-        driver.findElement(By.cssSelector(WElement.forgotPageUsernameField)).sendKeys(validUsername);
+    public void sendRequestForRecoveryPassword(String validUser) {
+        driver.findElement(By.cssSelector(WElement.forgotPageUsernameField)).sendKeys(validUser);
         driver.findElement(By.cssSelector(WElement.forgotPageEmailField)).sendKeys(validEmailAddress);
         driver.findElement(By.cssSelector(WElement.forgotPageSendMyPasswordButton)).click();
     }
 
     @Then("^\"Forgot Password Request Submitted\" message should be displayed on the page.$")
-    public void checkTheMessage(){
+    public void checkTheMessage() {
         String messageShouldBe = "Forgot Password request submitted";
         String messageWeHave = driver
                 .findElement(By.cssSelector(WElement.loginPage_MessageAfterRequestPasswordRecovery))
                 .getText();
-
         assertTrue(messageWeHave.equals(messageShouldBe));
     }
 
     @When("^Login to Easytox with \"([^\"]*)\" and \"([^\"]*)\" credentials.$")
-    public void loginToEasyTox(String username, String password){
-        driver.navigate().to(easyToxLoginPage);
+    public void loginToEasyTox(String username, String password) {
+        driver.navigate().to(easyToxAddress);
         driver.findElement(By.name(WElement.loginPage_fieldName)).sendKeys(username);
         driver.findElement(By.name(WElement.loginPage_passwordField)).sendKeys(password);
         driver.findElement(By.cssSelector(WElement.loginPage_loginButton)).click();
     }
 
     @Then("^User login should be successful.$")
-    public void checkCurrentPage(){
+    public void checkCurrentPage() {
         try {
             Thread.sleep(1000);
-            assertTrue(driver.getCurrentUrl().equals(currentLabPage));
+            assertTrue(driver.getCurrentUrl().equals(pageAfterSuccessfulLogging));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     @When("^Click \"Pending Password Requests\" link.$")
-    public void clickOnThePendingPasswordRequest(){
+    public void clickOnThePendingPasswordRequest() {
         try {
             Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.pendingPasswordRequest)).click();
@@ -111,114 +103,91 @@ public class PasswordResetLabPathologist {
             e.printStackTrace();
         }
     }
+
     @Then("^Following should be displayed:1 Password Requests$")
-    public void isPasswordRequestShowed(){
+    public void isPasswordRequestShowed() {
         boolean isPasswordRequestsShowed = driver
                 .findElement(By.cssSelector(WElement.passwordRequest))
                 .isDisplayed();
         assertTrue(isPasswordRequestsShowed);
     }
-    @And("^Forgot Password <link>$")
-    public void isForgotPasswordShowed(){
-        String request = "ForgotPassword SPathone";
+
+    @And("^Forgot Password   \"([^\"]*)\" <link>$")
+    public void isForgotPasswordShowed(String labClient) {
+
+        String request = "ForgotPassword " + labClient;
         List<WebElement> li = driver.findElements(By.cssSelector(WElement.userRequestLine));
-        assertTrue(li.size() > 0);
+        Optional<String> result = li.stream()
+                .map(e -> e.getText().replace("\n", " "))
+                .filter(e -> e.equals(request))
+                .findAny();
+
+        if (!result.isPresent()) {
+            assertTrue(isExistLabClient(labClient));
+            driver.findElement(By.cssSelector(WElement.pendingPasswordRequest)).click(); //open dropdown window to continue tests
+        } else {
+            assertTrue(result.isPresent());
+        }
     }
+
     @And("^See All Requests <Link>$")
-    public void isAllRequestLinkShowed(){
+    public void isAllRequestLinkShowed() {
         WebElement textLink = driver.findElement(By.linkText(WElement.textLinkSeeAllRequest));
         assertNotNull(textLink);
     }
 
-    @When("^Select \"See All Requests\".$")
-    public void selectAllRequest(){
-        driver.findElement(By.linkText(WElement.textLinkSeeAllRequest)).click();
+    @When("^Select Forgot Password   \"([^\"]*)\".$")
+    public void selectLabUserOne(String labClient) {
+        String request = "ForgotPassword\n" + labClient;
+        List<WebElement> li = driver.findElements(By.cssSelector(WElement.userRequestLine));
+        boolean isLabClientExist = li.stream().filter(e -> e.getText().equals(request)).findAny().isPresent();
+        if (!isLabClientExist) {
+            getLabClient(labClient).findElement(By.cssSelector(WElement.resetUserPasswordButton)).click();
+        }
     }
 
-    @Then("^Password Request List\" screen should be displayed.$")
-    public void isPasswordRequestListShowed(){
+    @Then("^Reset Password screen with following fields should be displayed: Request by: SNLabAdmin$")
+    public void isRequestByShowed() {
         try {
             Thread.sleep(1000);
-            String tableNameShouldBe = "Request List";
-            String tableNameWeHave = driver.findElement(By.cssSelector(WElement.tableName)).getText();
+            boolean isRequestByFieldShowed = driver
+                    .findElement(By.cssSelector(WElement.resetPasswordPage_RequestByTitle))
+                    .isDisplayed();
 
-            assertTrue(tableNameWeHave.equals(tableNameShouldBe));
+            String theValueOfRequestByShouldBe = "SNLabAdmin";
+            String theValueOfRequestByWeHave = driver
+                    .findElement(By.cssSelector(WElement.resetPasswordPage_RequestByValue))
+                    .getText();
+
+            assertTrue(isRequestByFieldShowed);
+            log.info(theValueOfRequestByShouldBe + "\n");
+            log.info(theValueOfRequestByWeHave + "\n");
+            assertTrue(theValueOfRequestByWeHave.equals(theValueOfRequestByShouldBe));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    @When("^Verify the details displayed for password reset request of \"([^\"]*)\".$")
-    public void findClient(String labClient){
-        allLabClientData = getLabClientWithStatusPending(labClient);
-        assertTrue(allLabClientData != null);
-    }
-
-    @Then("^Following values should be displayed against password reset request : Request -> \"([^\"]*)\"$")
-    public void isTypeOfRequestShowed(String requestType){
-        String requestTypeWeHave = allLabClientData.findElement(By.cssSelector(WElement.mainTable_request)).getText();
-
-        assertTrue(requestTypeWeHave.equals(requestType));
-    }
-
-    @And("^Requested by -> \"([^\"]*)\"$")
-    public void IsRequestBy(String username){
-        String usernameWeHave = allLabClientData.findElement(By.cssSelector(WElement.mainTable_requestedBy)).getText();
-        assertTrue(usernameWeHave.equals(username));
-    }
-
-    @And("^Requested Date -> valid date in the format \"([^\"]*)\"$")
-    public void isDateValid(String dateFormat){
-        String dateWeHave = dateForSearch = allLabClientData.findElement(By.cssSelector(WElement.mainTable_requestedDate)).getText();
-
-        boolean isDateEquals = false;
-        SimpleDateFormat format = new SimpleDateFormat(dateFormat);
-
-        try {
-            Date date = format.parse(dateWeHave);
-            if(dateWeHave.equals(format.format(date))){
-                isDateEquals = true;
-            }
-
-            assertTrue(isDateEquals);
-        } catch (ParseException e ) {
-            e.printStackTrace();
-        }
-    }
-
-    @And("^Requested email -> Entered email ID in Step 3 above.$")
-    public void isEmailValid(){
-        String emailWeHave = allLabClientData.findElement(By.cssSelector(WElement.mainTable_requestedEmail)).getText();
-        assertTrue(emailWeHave.equals(validEmailAddress));
-    }
-
-    @And("^Status -> \"([^\"]*)\"$")
-    public void checkTheStatus(String status){
-        String statusWeHave = allLabClientData.findElement(By.cssSelector(WElement.mainTable_status)).getText();
-        assertTrue(statusWeHave.equals(status));
-    }
-
-    @And("^Action -> Edit icon.$")
-    public void checkEditIcon(){
-        boolean isEditIconShowed = allLabClientData
-                .findElement(By.cssSelector(WElement.mainTable_editIcon))
+    @And("^Request Email: <entered valid email ID>$")
+    public void isRequestEmailShowed() {
+        boolean isRequestEmailFieldShowed = driver
+                .findElement(By.cssSelector(WElement.resetPasswordPage_RequestEmailTitle))
                 .isDisplayed();
-        assertTrue(isEditIconShowed);
+        boolean isRequestEmailValueShowed = driver
+                .findElement(By.cssSelector(WElement.resetPasswordPage_RequestEmailValue))
+                .isDisplayed();
+        assertTrue(isRequestEmailFieldShowed && isRequestEmailValueShowed);
     }
 
-    @When("^Click on Edit icon against SPathOne request.$")
-    public void clickOnEditIcon(){
-        driver.findElement(By.cssSelector(WElement.mainTable_editIcon)).click();
-    }
-
-    @Then("^Reset Password screen should be displayed.$")
-    public void isResetPasswordScreenShowed(){
-        try {
-            Thread.sleep(1000);
-            assertTrue(driver.getCurrentUrl().equals(resetPasswordPage));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    @And("^New Password <Input Box>$")
+    public void isNewPasswordShowed() {
+        boolean isNewPasswordTitleShowed = driver
+                .findElement(By.cssSelector(WElement.resetPasswordPage_newPasswordFieldTitle))
+                .isDisplayed();
+        boolean isNewPasswordFieldShowed = driver
+                .findElement(By.cssSelector(WElement.resetPasswordPage_newPasswordField))
+                .isDisplayed();
+        assertTrue(isNewPasswordTitleShowed && isNewPasswordFieldShowed);
     }
 
     @When("^Enter a new password \"([^\"]*)\" in the \"New Password\" field and click Save.$")
@@ -235,7 +204,7 @@ public class PasswordResetLabPathologist {
     @Then("^\"([^\"]*)\" message should be displayed.$")
     public void checkTheResultOfSettingNewPassword(String messageShouldBe) {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             String messageWeHave = driver
                     .findElement(By.cssSelector(WElement.resultOfChangePassword))
                     .getText();
@@ -247,26 +216,8 @@ public class PasswordResetLabPathologist {
         }
     }
 
-    @And("^Status of the request should be changed to \"([^\"]*)\".$")
-    public void checkStatusOfRequest(String status){
-        try {
-            Thread.sleep(1000);
-            driver.findElement(By.cssSelector(WElement.pendingPasswordRequest)).click();
-            Thread.sleep(300);
-            driver.findElement(By.linkText(WElement.textLinkSeeAllRequest)).click();
-            Thread.sleep(1000);
-            driver.findElement(By.cssSelector(WElement.searchField)).sendKeys(dateForSearch);
-            String statusWeHave = driver
-                    .findElement(By.cssSelector(WElement.mainTable_status))
-                    .getText();
-            assertTrue(statusWeHave.equals(status));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @When("^Login to the Easytox with \"([^\"]*)\" and \"([^\"]*)\" credentials.$")
-    public void loginIntoEasyTox(String login, String password){
+    @When("^Login to the Easytox with login \"([^\"]*)\" and password \"([^\"]*)\" credentials.$")
+    public void loginIntoEasyTox(String login, String password) {
         try {
             signOut();
             Thread.sleep(1000);
@@ -278,8 +229,8 @@ public class PasswordResetLabPathologist {
         }
     }
 
-    @Then("^\"Change Password\" screen with following fields should be displayed : Username$")
-    public void isUsernameFieldShowed(){
+    @Then("^\"Change Password\" screen with following fields should be displayed: Username$")
+    public void isUsernameFieldShowed() {
         boolean isUsernameFieldShowed = driver
                 .findElement(By.cssSelector(WElement.changePasswordPage_usernameField))
                 .isDisplayed();
@@ -287,21 +238,23 @@ public class PasswordResetLabPathologist {
     }
 
     @And("^Old Password$")
-    public void isOldPasswordFieldShowed(){
+    public void isOldPasswordFieldShowed() {
         boolean isOldPasswordFieldShowed = driver
                 .findElement(By.cssSelector(WElement.changePasswordPage_oldPasswordField))
                 .isDisplayed();
         assertTrue(isOldPasswordFieldShowed);
     }
+
     @And("^New Password$")
-    public void isNewPasswordFieldShowed(){
+    public void isNewPasswordFieldShowed() {
         boolean isNewPasswordFieldShowed = driver
                 .findElement(By.cssSelector(WElement.changePasswordPage_newPasswordField))
                 .isDisplayed();
         assertTrue(isNewPasswordFieldShowed);
     }
+
     @And("^Confirm Password$")
-    public void isConfirmPasswordFieldShowed(){
+    public void isConfirmPasswordFieldShowed() {
         boolean isConfirmPasswordFieldShowed = driver
                 .findElement(By.cssSelector(WElement.changePasswordPage_confirmPasswordField))
                 .isDisplayed();
@@ -316,15 +269,13 @@ public class PasswordResetLabPathologist {
             String autoPopulatedUsernameWeHave = driver
                     .findElement(By.cssSelector(WElement.changePasswordPage_usernameField))
                     .getAttribute("value");
-//            log.info(autoPopulatedUsername + "\n");
-//            log.info(autoPopulatedUsernameWeHave + "\n");
             assertTrue(autoPopulatedUsername.equals(autoPopulatedUsernameWeHave));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    @Then("^\"SPathOne\" should be autopopulated in \"username\" field and it should NOT be editable.$")
+    @Then("^\"SPhyTwo\" should be autopopulated in \"username\" field and it should NOT be editable.$")
     public void isUsernameFieldEditable(){
         String editable = driver
                 .findElement(By.cssSelector(WElement.changePasswordPage_usernameField))
@@ -403,8 +354,11 @@ public class PasswordResetLabPathologist {
     public void checkUserLogging(){
         try {
             Thread.sleep(1000);
-            String thePageShouldBe = "http://bmtechsol.com:8080/easytox/caseOrder/list";
+            String thePageShouldBe = "http://bmtechsol.com:8080/easytox/lab/payment";
             String thePageWeHave = driver.getCurrentUrl();
+
+            log.info(thePageShouldBe + "\n");
+            log.info(thePageWeHave + "\n");
 
             assertTrue(thePageWeHave.equals(thePageShouldBe));
         } catch (InterruptedException e) {
@@ -413,19 +367,32 @@ public class PasswordResetLabPathologist {
     }
 
     @After
-    public void close(){driver.close();}
+    public void close(){
+        driver.close();
+    }
 
-    private WebElement getLabClientWithStatusPending(String labClient) {
-        List<WebElement> allResults ;
-
+    private boolean isExistLabClient(String labClient) {
         try {
-            Thread.sleep(300);
-            driver.findElement(By.cssSelector(WElement.pendingPasswordRequest)).click();
-            Thread.sleep(300);
             driver.findElement(By.linkText(WElement.textLinkSeeAllRequest)).click();
             Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.searchField)).sendKeys(labClient);
-            Thread.sleep(100);
+            Thread.sleep(1000);
+            WebElement rowWithResult = driver.findElement(By.cssSelector(WElement.firstRowInResultOfSearch));
+            return rowWithResult != null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private WebElement getLabClient(String labClient) {
+        List<WebElement> allResults = null;
+
+        try {
+            driver.findElement(By.linkText(WElement.textLinkSeeAllRequest)).click();
+            Thread.sleep(1000);
+            driver.findElement(By.cssSelector(WElement.searchField)).sendKeys(labClient);
+            Thread.sleep(1000);
             new Select(driver.findElement(By.cssSelector(WElement.itemPerPage))).selectByVisibleText("All");
             allResults = driver.findElements(By.cssSelector(WElement.allResultOfSearch));
             Thread.sleep(1000);
@@ -442,13 +409,12 @@ public class PasswordResetLabPathologist {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
-    private void signOut(){
+    private void signOut() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.loginDropDown)).click();
             Thread.sleep(500);
             driver.findElement(By.cssSelector(WElement.signOutField)).click();
