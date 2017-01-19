@@ -6,7 +6,6 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -43,7 +42,7 @@ public class VerifyTheSearchResultSteps {
     @Then("^User login should be successful.$")
     public void checkCurrentPage() {
         try {
-            TestCase.assertTrue(driver.getCurrentUrl().equals(pageAfterSuccessfulLogging));
+            assertTrue(driver.getCurrentUrl().equals(pageAfterSuccessfulLogging));
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -72,7 +71,7 @@ public class VerifyTheSearchResultSteps {
             String tableNameShouldBe = "Request List";
             String tableNameWeHave = driver.findElement(By.cssSelector(WElement.tableName)).getText();
 
-            TestCase.assertTrue(tableNameWeHave.equals(tableNameShouldBe));
+            assertTrue(tableNameWeHave.equals(tableNameShouldBe));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -96,7 +95,6 @@ public class VerifyTheSearchResultSteps {
 
         assertTrue(text.contains(criteria.trim()));
     }
-
 
     @After
     public void close() {
