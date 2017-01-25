@@ -1,6 +1,6 @@
 Feature: Security framework test
 
-  Scenario: Create new order
+  Scenario: Create new order 1
 
     When Login to Easytox with "PhyOnee" and "Test@123" credentials.
     Then User login should be successful.
@@ -45,3 +45,35 @@ Feature: Security framework test
     When Click Submit
     Then Order List screen with newly created order should be displayed.
 
+    When Login to EasyTox with credentials "PathOne" and "Test@123"
+    Then User login should be successful again.
+
+    When Click Pending Orders.
+    Then Orders List screen should be displayed.
+
+    When Verify that the order created in above case is displayed in the Orders List.
+    Then Newly created order should be displayed in the list.
+
+    When Click on Order Number.
+    Then "Update CaseOrder" screen should be displayed.
+
+    When Click Accept Order.
+    Then Order should be converted to Case and "Update Case" screen should be displayed.
+
+    When Under Test Screen section, select concentration for 'Compound1' such that test results are "Positive Result".
+    Then Selections should be made as appropriately for 'Compound1'.
+
+    When Under Test Screen section, select concentration for 'Compound2' such that test results are "Positive Result".
+    Then Selections should be made as appropriately for 'Compound2'.
+
+    When Under Validity Testing section, select concentration for 'VCompound1' in such a way that test results are "Normal Result".
+    Then Selections should be made as appropriately for 'VCompound1'.
+
+    When Under Validity Testing section, select concentration for 'VCompound2' in such a way that test results are "Normal Result".
+    Then Selections should be made as appropriately for 'VCompound2'.
+
+    When Click Update.
+    Then Case List screen should be populated with Case 'Status' as "Ready for pathologist".
+
+#    When Select 'Tasks' from the top menu.
+#    Then Above Case should be listed under 'Cases in Pending' section.

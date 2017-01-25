@@ -1,4 +1,4 @@
-package com.easytox.automation.steps.security.reports.case_1_reports;
+package com.easytox.automation.steps.security.reports.case_3_reports;
 
 import com.easytox.automation.driver.DriverBase;
 import cucumber.api.java.After;
@@ -10,34 +10,38 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-public class CreateNewOrderSteps {
+public class CreateNewOrderSteps3 {
     private WebDriver driver;
-    private Logger log = Logger.getLogger(CreateNewOrderSteps.class);
+    private WebDriverWait wait;
+    private Logger log = Logger.getLogger(CreateNewOrderSteps3.class);
     private static final String LOGIN_URL = "http://bmtechsol.com:8080/easytox/";
-    private static final String ERROR_WHEN_LOGIN_URL = "http://bmtechsol.com:8080/easytox/?login_error=1&format=";
+    private static final String ERROR_IN_LOGIN_URL = "http://bmtechsol.com:8080/easytox/?login_error=1&format=";
     private static final String CREATE_NEW_ORDER_URL = "http://bmtechsol.com:8080/easytox/orderFrom/create";
 
     private int totalRecordsInOrderListBeforeCreationNewOrder = 0;
-    private int totalRecordsInOrderListAfterCreationNewOrder = 0;
+    private String caseAccession = null;
+    private String newOrder = null;
 
     @Before
     public void init() {
         DriverBase.instantiateDriverObject();
         driver = DriverBase.getDriver();
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+
+        wait = new WebDriverWait(driver, 15);
     }
 
     @When("^Login to Easytox with \"([^\"]*)\" and \"([^\"]*)\" credentials.$")
@@ -52,30 +56,32 @@ public class CreateNewOrderSteps {
     public void checkCurrentPage() {
         try {
             String currentUrl = driver.getCurrentUrl();
-            assertTrue(!currentUrl.equals(LOGIN_URL) && !currentUrl.equals(ERROR_WHEN_LOGIN_URL));
+            assertTrue(!currentUrl.equals(LOGIN_URL) && !currentUrl.equals(ERROR_IN_LOGIN_URL));
+
+            new Select(driver.findElement(By.cssSelector(WElement.AMOUNT_OF_RECORDS_PER_ONE_PAGE)))
+                    .selectByVisibleText("All");
             totalRecordsInOrderListBeforeCreationNewOrder = driver
                     .findElements(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
                     .size();
 
-            log.info(totalRecordsInOrderListBeforeCreationNewOrder);
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    @When("^Select 'Create Order' from left hand menu\\.$")
+    @When("^Select 'Create Order' from left hand menu.$")
     public void clickOnCreateOrder() {
         driver.findElement(By.cssSelector(WElement.CREATE_NEW_ORDER)).click();
     }
 
-    @Then("^'Create Order' page should be displayed\\.$")
+    @Then("^'Create Order' page should be displayed.$")
     public void create_Order_page_should_be_displayed() {
         String currentUrl = driver.getCurrentUrl();
         assertTrue(currentUrl.equals(CREATE_NEW_ORDER_URL));
     }
 
-    @When("^Verify the value displayed in 'Location' drop down\\.$")
+    @When("^Verify the value displayed in 'Location' drop down.$")
     public void checkValueInLocationDropDown() {
         List<WebElement> locations =
                 new Select(driver.findElement(By.cssSelector(WElement.ORDER_LOCATION)))
@@ -83,7 +89,7 @@ public class CreateNewOrderSteps {
         assertFalse(locations.isEmpty());
     }
 
-    @Then("^\"([^\"]*)\" should be displayed in the Location drop down\\.$")
+    @Then("^\"([^\"]*)\" should be displayed in the Location drop down.$")
     public void checkLabClientInDropDownMenu(String labClient) {
         List<WebElement> locations =
                 new Select(driver.findElement(By.cssSelector(WElement.ORDER_LOCATION)))
@@ -111,7 +117,7 @@ public class CreateNewOrderSteps {
         assertTrue(allSelectedLab.size() == 1 && selectedLab.equals(labClient));
     }
 
-    @When("^Select Patient \"([^\"]*)\" from the 'Patient' drop down.$") //TODO: 1/19/17
+    @When("^Select Patient \"([^\"]*)\" from the 'Patient' drop down.$")
     public void selectPatient(String patientForSelect) {
         List<WebElement> allPatientFromDropDown = new Select(driver.findElement(By.cssSelector(WElement.ORDER_PATIENT))).getOptions();
 
@@ -138,6 +144,11 @@ public class CreateNewOrderSteps {
 
     @When("^Enter a valid Date Collected.$")
     public void enterValidDate() {
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         driver.findElement(By.cssSelector(WElement.ORDER_DATE)).click();
     }
 
@@ -189,19 +200,29 @@ public class CreateNewOrderSteps {
         assertTrue(loggedInValueWeHave.equals(loggedInValue));
     }
 
-    @When("^Select Prescribed Medicine as \"([^\"]*)\"$")
-    public void selectSubscribeMedicine(String medicine) {
-        new Select(driver.findElement(By.cssSelector(WElement.ORDER_PRESCRIBE_MEDICINE))).selectByVisibleText(medicine);
+    @When("^Select Prescribed Medicine as \"([^\"]*)\" and \"([^\"]*)\"$")
+    public void selectSubscribeMedicine(String medicine1, String medicine2) {
+        new Select(driver.findElement(By.cssSelector(WElement.ORDER_PRESCRIBE_MEDICINE))).selectByVisibleText(medicine1);
+        new Select(driver.findElement(By.cssSelector(WElement.ORDER_PRESCRIBE_MEDICINE))).selectByVisibleText(medicine2);
+
+
     }
 
     @Then("^User selection should be successful.$")
     public void checkTheMedicineSelection() {
-        String medicineWeHave = new Select(driver.findElement(By.cssSelector(WElement.ORDER_PRESCRIBE_MEDICINE)))
-                .getFirstSelectedOption()
-                .getText();
-        String medicineShouldBe = "Drug1";
+        List<String> medicinesWeHave = new Select(driver.findElement(By.cssSelector(WElement.ORDER_PRESCRIBE_MEDICINE)))
+                .getAllSelectedOptions()
+                .stream()
+                .map(WebElement::getText)
+                .collect(Collectors.toList());
 
-        assertTrue(medicineWeHave.equals(medicineShouldBe));
+        int amountDrugsShouldBe = 2;
+        String medicineShouldBe1 = "Drug1";
+        String medicineShouldBe2 = "Drug2";
+
+        assertTrue(medicinesWeHave.size() == amountDrugsShouldBe);
+        assertTrue(medicinesWeHave.contains(medicineShouldBe1));
+        assertTrue(medicinesWeHave.contains(medicineShouldBe2));
     }
 
     @When("^Select primary Physician as \"([^\"]*)\".$")
@@ -219,14 +240,14 @@ public class CreateNewOrderSteps {
 
     @When("Select Pathologist as \"([^\"]*)\"")
     public void selectThePathologist(String pathologist) {
-        Optional<WebElement> path = new Select(driver
+        Optional<WebElement> patholog = new Select(driver
                 .findElement(By.cssSelector(WElement.PATHOLOGIST_GROUP))
                 .findElement(By.cssSelector(WElement.ORDER_SELECT_PATHOLOGIST)))
                 .getOptions()
                 .stream().filter(e -> e.getText().equals(pathologist)).findFirst();
 
-        if (path.isPresent()) {
-            path.get().click();
+        if (patholog.isPresent()) {
+            patholog.get().click();
         }
     }
 
@@ -256,19 +277,6 @@ public class CreateNewOrderSteps {
         String compoundProfileWeHave = new Select(driver.findElement(By.cssSelector(WElement.ORDER_COMPOUND_PROFILE)))
                 .getFirstSelectedOption().getText();
         assertTrue(compoundProfileWeHave.equals(compoundProfileShouldBe));
-    }
-
-    private int getIndexOfOptionForSelect(List<WebElement> allPatients, String selectedPatient) {
-        int indexOfThePatientsName = 0;
-        for (int i = 0; i < allPatients.size(); i++) {
-            String[] allDataOfSelectedPatient = allPatients.get(i).getText().split(",");
-            String patientName = allDataOfSelectedPatient[indexOfThePatientsName].trim();
-
-            if (patientName.equals(selectedPatient)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     @When("^Verify the details displayed when Compound Profile is selected.$")
@@ -316,25 +324,238 @@ public class CreateNewOrderSteps {
     @Then("^Order List screen with newly created order should be displayed.$")
     public void checkNewOrder() {
         try {
-            Thread.sleep(2000);
+            int positionOfNewOrdersID = 3;
             String activePageShouldBe = "Order List";
             String activePageWeHave = driver.findElement(By.cssSelector(WElement.ACTIVE_PAGE)).getText();
 
-            totalRecordsInOrderListAfterCreationNewOrder = driver
+            new Select(driver.findElement(By.cssSelector(WElement.AMOUNT_OF_RECORDS_PER_ONE_PAGE)))
+                    .selectByVisibleText("All");
+            Thread.sleep(1000);
+            int totalRecordsInOrderListAfterCreationNewOrder = driver
                     .findElements(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
                     .size();
 
-            Thread.sleep(1000);
-
             assertTrue(activePageWeHave.equals(activePageShouldBe));
             assertTrue(totalRecordsInOrderListBeforeCreationNewOrder < totalRecordsInOrderListAfterCreationNewOrder);
+
+            newOrder = driver.findElement(By.cssSelector(WElement.PAGE_TITLE_AFTER_CREATING_ORDER))
+                    .getText()
+                    .split(" ")[positionOfNewOrdersID];
+            logout();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getIndexOfOptionForSelect(List<WebElement> allPatients, String selectedPatient) {
+        int indexOfThePatientsName = 0;
+        for (int i = 0; i < allPatients.size(); i++) {
+            String[] allDataOfSelectedPatient = allPatients.get(i).getText().split(",");
+            String patientName = allDataOfSelectedPatient[indexOfThePatientsName].trim();
+
+            if (patientName.equals(selectedPatient)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void logout() {
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(WElement.LOGIN_AREA))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Sign out"))).click();
+    }
+
+    /**
+     *Case finalize
+     **/
+
+    @When("^Login to EasyTox with credentials \"([^\"]*)\" and \"([^\"]*)\"$")
+    public void loginToEasyToxAgain(String username, String password) {
+        driver.navigate().to(LOGIN_URL);
+        driver.findElement(By.name(WElement.LOGIN_PAGE_FIELD_NAME)).sendKeys(username);
+        driver.findElement(By.name(WElement.LOGIN_PAGE_PASSWORD_FIELD)).sendKeys(password);
+        driver.findElement(By.cssSelector(WElement.LOGIN_PAGE_LOGIN_BUTTON)).click();
+    }
+
+    @Then("^User login should be successful again.$")
+    public void checkCurrentPageAgain() {
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue(!currentUrl.equals(LOGIN_URL) && !currentUrl.equals(ERROR_IN_LOGIN_URL));
+    }
+
+    @When("^Click Pending Orders.$")
+    public void clickPendingOrders() {
+        try {
+            Thread.sleep(2000);
+            driver.findElement(By.cssSelector(WElement.PENDING_ORDERS)).click();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Then("^Orders List screen should be displayed.$")
+    public void checkDisplayedScreen() {
+        String activePageShouldBe = "Order List";
+        String activePageWeHave = driver.findElement(By.cssSelector(WElement.ACTIVE_PAGE)).getText();
+
+        assertTrue(activePageWeHave.equals(activePageShouldBe));
+    }
+
+    @When("^Verify that the order created in above case is displayed in the Orders List.$")
+    public void verifyNewOrder() {
+        driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(newOrder);
+    }
+
+    @Then("^Newly created order should be displayed in the list.$")
+    public void newOrderShouldBeDisplayed() {
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        int ordersIDIndex = 0;
+        String numberWeHave = driver
+                .findElements(By.cssSelector(WElement.ONE_COLUMN_IN_ROW))
+                .get(ordersIDIndex)
+                .getText();
+        assertTrue(numberWeHave.equals(newOrder));
+    }
+
+    @When("Click on Order Number.")
+    public void clickOnOrderNumber() {
+        driver
+                .findElement(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
+                .findElement(By.cssSelector(WElement.NEW_ORDER_CELL))
+                .submit();
+    }
+
+    @Then("^\"([^\"]*)\" screen should be displayed.$")
+    public void checkUpdateCaseOrderScreen(String screenShouldBeShowed) {
+        String screenWeHave = driver.findElement(By.cssSelector(WElement.ACTIVE_PAGE)).getText();
+        assertTrue(screenWeHave.equals(screenShouldBeShowed));
+    }
+
+    @When("^Click Accept Order.$")
+    public void clickAcceptOrder() {
+        try {
+            Thread.sleep(1500);
+            driver.findElement(By.cssSelector(WElement.ACCEPT_NEW_ORDER)).click();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Then("^Order should be converted to Case and \"([^\"]*)\" screen should be displayed.$")
+    public void checkCurrentScreenAndConvertationOfOrderToCase(String pageShouldBe) {
+        try {
+            Thread.sleep(1000);
+            String activePageWeHave = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(WElement.ACTIVE_PAGE))).getText();
+            int indexOfCaseAccession = 1;
+            caseAccession = driver
+                    .findElement(By.cssSelector(WElement.CASE_ACCESSION_ON_UPDATE_CASE_PAGE))
+                    .getText()
+                    .split(" ")[indexOfCaseAccession]
+                    .trim();
+            assertTrue(activePageWeHave.equals(pageShouldBe));
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @When("^Under Test Screen section, select concentration for 'Compound1' such that test results are \"([^\"]*)\".$")
+    public void checkTestResultForCompound1(String resultTestShouldBe) {
+        String resultTestWeHave = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_COMPOUND_1))
+                .getAttribute("value");
+        assertTrue(resultTestWeHave.equals(resultTestShouldBe));
+    }
+
+    @Then("^Selections should be made as appropriately for 'Compound1'.$")
+    public void findFieldTestResultCompound1() {
+        boolean isResultTestForCompound1Showed = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_COMPOUND_1))
+                .isDisplayed();
+        assertTrue(isResultTestForCompound1Showed);
+    }
+
+    @When("^Under Test Screen section, select concentration for 'Compound2' such that test results are \"([^\"]*)\".$")
+    public void checkTestResultCompound2(String resultTestShouldBe) {
+        String resultTestWeHave = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_COMPOUND_2))
+                .getAttribute("value");
+        assertTrue(resultTestWeHave.equals(resultTestShouldBe));
+    }
+
+    @Then("^Selections should be made as appropriately for 'Compound2'.$")
+    public void findFieldTestResultCompound2() {
+        boolean isResultTestForCompound1Showed = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_COMPOUND_2))
+                .isDisplayed();
+        assertTrue(isResultTestForCompound1Showed);
+    }
+
+    @When("^Under Validity Testing section, select concentration for 'VCompound1' in such a way that test results are \"([^\"]*)\".$")
+    public void checkTestResultForVCompound1(String resultTestShouldBe) {
+        String resultTestWeHave = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_1))
+                .getAttribute("value");
+        assertTrue(resultTestWeHave.equals(resultTestShouldBe));
+    }
+
+    @Then("^Selections should be made as appropriately for 'VCompound1'.$")
+    public void findFieldTestResultVCompound1() {
+        boolean isResultTestForCompound1Showed = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_1))
+                .isDisplayed();
+        assertTrue(isResultTestForCompound1Showed);
+    }
+
+    @When("^Under Validity Testing section, select concentration for 'VCompound2' in such a way that test results are \"([^\"]*)\".$")
+    public void checkTestResultVCompound2(String resultTestShouldBe) {
+        String resultTestWeHave = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_2))
+                .getAttribute("value");
+        assertTrue(resultTestWeHave.equals(resultTestShouldBe));
+    }
+
+    @Then("^Selections should be made as appropriately for 'VCompound2'.$")
+    public void findFieldTestResultVCompound2() {
+        boolean isResultTestForCompound1Showed = driver
+                .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_2))
+                .isDisplayed();
+        assertTrue(isResultTestForCompound1Showed);
+    }
+
+    @When("^Click Update.$")
+    public void clickUpdateOrder() {
+        Optional<WebElement> popup = driver.findElements(By.cssSelector(WElement.xxxxxxx_POPUP_CLOSE)).stream().findAny();
+        if (popup.isPresent()) {
+            popup.get().click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(WElement.UPDATE_ORDER))).click();
+        }
+    }
+
+    @Then("^Case List screen should be populated with Case 'Status' as \"([^\"]*)\".$")
+    public void checkStatusOfOrder(String statusShouldBe) {
+        try {
+            Thread.sleep(2500);
+            int indexOfColumnWithStatus = 6;
+
+            driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
+            String statusWeHave = driver.findElement(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
+                    .findElements(By.cssSelector(WElement.ONE_COLUMN_IN_ROW))
+                    .get(indexOfColumnWithStatus)
+                    .getText();
+            assertTrue(statusWeHave.equals(statusShouldBe));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     @After
-    public void close() {
+    public void close(){
         driver.close();
     }
 }

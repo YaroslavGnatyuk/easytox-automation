@@ -1,11 +1,5 @@
 package com.easytox.automation.driver;
 
-import static org.openqa.selenium.remote.CapabilityType.PROXY;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
@@ -17,6 +11,12 @@ import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.openqa.selenium.remote.CapabilityType.PROXY;
 
 public enum DriverType implements DriverSetup {
 
@@ -50,6 +50,7 @@ public enum DriverType implements DriverSetup {
             String platform = System.getProperty("os.name");
 
             DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+            capabilities.setCapability("disable-popup-blocking", false);
             capabilities.setCapability("chrome.switches", Arrays.asList("--no-default-browser-check"));
             HashMap<String, String> chromePreferences = new HashMap<String, String>();
             chromePreferences.put("profile.password_manager_enabled", "false");
