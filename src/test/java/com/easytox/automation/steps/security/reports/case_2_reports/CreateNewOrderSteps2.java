@@ -8,6 +8,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -456,6 +457,14 @@ public class CreateNewOrderSteps2 {
 
     @When("^Under Test Screen section, select concentration for 'Compound1' such that test results are \"([^\"]*)\".$")
     public void checkTestResultForCompound1(String resultTestShouldBe) {
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        driver.findElement(By.cssSelector(WElement.COMPOUND_1_CONCENTRATION)).sendKeys("2");
+        driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
+
         String resultTestWeHave = driver
                 .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_COMPOUND_1))
                 .getAttribute("value");
@@ -472,6 +481,8 @@ public class CreateNewOrderSteps2 {
 
     @When("^Under Test Screen section, select concentration for 'Compound2' such that test results are \"([^\"]*)\".$")
     public void checkTestResultCompound2(String resultTestShouldBe) {
+        driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys("5");
+        driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
         String resultTestWeHave = driver
                 .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_COMPOUND_2))
                 .getAttribute("value");
@@ -488,6 +499,8 @@ public class CreateNewOrderSteps2 {
 
     @When("^Under Validity Testing section, select concentration for 'VCompound1' in such a way that test results are \"([^\"]*)\".$")
     public void checkTestResultForVCompound1(String resultTestShouldBe) {
+        driver.findElement(By.cssSelector(WElement.VCOMPOUND_1_CONCENTRATION)).sendKeys("10");
+        driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
         String resultTestWeHave = driver
                 .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_1))
                 .getAttribute("value");
@@ -504,6 +517,8 @@ public class CreateNewOrderSteps2 {
 
     @When("^Under Validity Testing section, select concentration for 'VCompound2' in such a way that test results are \"([^\"]*)\".$")
     public void checkTestResultVCompound2(String resultTestShouldBe) {
+        driver.findElement(By.cssSelector(WElement.VCOMPOUND_2_CONCENTRATION)).sendKeys("3");
+        driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
         String resultTestWeHave = driver
                 .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_2))
                 .getAttribute("value");
@@ -520,11 +535,7 @@ public class CreateNewOrderSteps2 {
 
     @When("^Click Update.$")
     public void clickUpdateOrder() {
-        Optional<WebElement> popup = driver.findElements(By.cssSelector(WElement.xxxxxxx_POPUP_CLOSE)).stream().findAny();
-        if (popup.isPresent()) {
-            popup.get().click();
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(WElement.UPDATE_ORDER))).click();
-        }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(WElement.UPDATE_ORDER))).click();
     }
 
     @Then("^Case List screen should be populated with Case 'Status' as \"([^\"]*)\".$")
@@ -543,6 +554,99 @@ public class CreateNewOrderSteps2 {
             e.printStackTrace();
         }
     }
+
+    @When("^Select 'Tasks' from the top menu.$")
+    public void selectTasks() {
+        driver.findElement(By.cssSelector(WElement.TASKS)).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("See All Cases"))).click();
+    }
+
+    @Then("^Above Case should be listed under 'Cases in Pending' section.$")
+    public void checkAboveCaseUnderCaseInPending() {
+
+        int indexOfCaseNumber = 0;
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(WElement.SEARCH_ORDER_FIELD))).sendKeys(caseAccession);
+        try {
+            Thread.sleep(1500);
+            String caseNumberWeHave = driver.findElement(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
+                    .findElements(By.cssSelector(WElement.ONE_COLUMN_IN_ROW))
+                    .get(indexOfCaseNumber)
+                    .getText();
+            assertTrue(caseAccession.equals(caseNumberWeHave));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @When("^Select Case # from the 'Cases in Pending' list.$")
+    public void selectCase() {
+        int indexOfCaseNumber = 0;
+
+        driver.findElement(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
+                .findElements(By.cssSelector(WElement.ONE_COLUMN_IN_ROW))
+                .get(indexOfCaseNumber)
+                .findElement(By.id(WElement.CASE_NUMBER))
+                .click();
+    }
+
+    @Then("^\"([^\"]*)\" screen is displayed.$")
+    public void isUpdateScreenShowed(String activePageShouldBe) {
+        String activePageWeHave = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(WElement.ACTIVE_PAGE))).getText();
+        assertTrue(activePageWeHave.equals(activePageShouldBe));
+    }
+
+    @When("^Select 'Finalized' radio option.$")
+    public void selectFinalizedRadioOption() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        driver.findElement(By.xpath(WElement.FINALIZED_RADIO_OPTION)).click();
+    }
+
+    @Then("A confirmation message \"([^\"]*)\" should be displayed.")
+    public void checkConfirmationMessage(String confirmationMessageShouldBe) {
+        String confirmationMessageWeHave = wait
+                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(WElement.CONFIRMATION_MESSAGE)))
+                .getText();
+        assertTrue(confirmationMessageWeHave.equals(confirmationMessageShouldBe));
+    }
+
+    @When("^Click Finalize and enter Sign Pin when it prompts for Sign Pin.$")
+    public void finalizeAndEnterPin() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(WElement.CLOSE_POPUP_WINDOW))).click();
+
+        String pin = "2016";
+        driver.findElement(By.cssSelector(WElement.FINALIZE_BUTTON)).click();
+        driver.findElement(By.cssSelector(WElement.PIN_PLACEHOLDER)).sendKeys(pin);
+        driver.findElement(By.cssSelector(WElement.APPLY_SIGNATURE_BUTTON)).click();
+    }
+
+    @Then("^Case should be finalized successfully.$")
+    public void checkCaseStatus() {
+        int indexOfStatus = 6;
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(WElement.SEARCH_ORDER_FIELD)))
+                .sendKeys(caseAccession);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String statusWeHave = driver
+                .findElement(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
+                .findElements(By.cssSelector(WElement.ONE_COLUMN_IN_ROW))
+                .get(indexOfStatus)
+                .getText();
+        assertTrue(statusWeHave.equals("finalized"));
+    }
+
+    /**
+     * Verify Report
+     **/
 
     @After
     public void close(){

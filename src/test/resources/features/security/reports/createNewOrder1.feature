@@ -75,5 +75,14 @@ Feature: Security framework test
     When Click Update.
     Then Case List screen should be populated with Case 'Status' as "Ready for pathologist".
 
-#    When Select 'Tasks' from the top menu.
-#    Then Above Case should be listed under 'Cases in Pending' section.
+    When Select 'Tasks' from the top menu.
+    Then Above Case should be listed under 'Cases in Pending' section.
+
+    When Select Case # from the 'Cases in Pending' list.
+    Then "Update Case" screen is displayed.
+
+    When Select 'Finalized' radio option.
+    Then A confirmation message "Are you sure you want to finalize the case. Please verify the results before finalizing" should be displayed.
+
+    When Click Finalize and enter Sign Pin when it prompts for Sign Pin.
+    Then Case should be finalized successfully.

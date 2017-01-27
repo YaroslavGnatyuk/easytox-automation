@@ -60,20 +60,29 @@ Feature: Security framework test
     When Click Accept Order.
     Then Order should be converted to Case and "Update Case" screen should be displayed.
 
-    When Under Test Screen section, select concentration for 'Compound1' such that test results are "Positive".
+    When Under Test Screen section, select concentration for 'Compound1' such that test results are "Positive Result".
     Then Selections should be made as appropriately for 'Compound1'.
 
-    When Under Test Screen section, select concentration for 'Compound2' such that test results are "Pos".
+    When Under Test Screen section, select concentration for 'Compound2' such that test results are "Positive Result".
     Then Selections should be made as appropriately for 'Compound2'.
 
-    When Under Validity Testing section, select concentration for 'VCompound1' in such a way that test results are "Positive".
+    When Under Validity Testing section, select concentration for 'VCompound1' in such a way that test results are "Normal Result".
     Then Selections should be made as appropriately for 'VCompound1'.
 
-    When Under Validity Testing section, select concentration for 'VCompound2' in such a way that test results are "Pos".
+    When Under Validity Testing section, select concentration for 'VCompound2' in such a way that test results are "Normal Result".
     Then Selections should be made as appropriately for 'VCompound2'.
 
     When Click Update.
-    Then Case List screen should be populated with Case 'Status' as "processing".
+    Then Case List screen should be populated with Case 'Status' as "Ready for pathologist".
 
-#    When Select 'Tasks' from the top menu.
-#    Then Above Case should be listed under 'Cases in Pending' section.
+    When Select 'Tasks' from the top menu.
+    Then Above Case should be listed under 'Cases in Pending' section.
+
+    When Select Case # from the 'Cases in Pending' list.
+    Then "Update Case" screen is displayed.
+
+    When Select 'Finalized' radio option.
+    Then A confirmation message "Are you sure you want to finalize the case. Please verify the results before finalizing" should be displayed.
+
+    When Click Finalize and enter Sign Pin when it prompts for Sign Pin.
+    Then Case should be finalized successfully.
