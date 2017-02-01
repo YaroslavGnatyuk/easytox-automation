@@ -2,6 +2,7 @@ package com.easytox.automation.steps.security.reports.case_1_reports;
 
 import com.easytox.automation.driver.DriverBase;
 import cucumber.api.java.After;
+import com.easytox.automation.steps.security.reports.Order;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
@@ -35,6 +36,9 @@ public class CreateNewOrderSteps1 {
     private int totalRecordsInOrderListBeforeCreationNewOrder = 0;
     private String caseAccession = null;
     private String newOrder = null;
+
+    private Order orderFromWebPage;
+    private Order orderFromPDF;
 
     @Before
     public void init() {
