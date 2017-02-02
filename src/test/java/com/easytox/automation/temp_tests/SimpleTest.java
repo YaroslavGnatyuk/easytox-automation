@@ -1,18 +1,25 @@
 package com.easytox.automation.temp_tests;
 
+import org.junit.Test;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class SimpleTest {
+
+    @Test
     public void setPatientNameAndPhysician() {
-        String demo = "Patient Name : Patient  Test Physician : Phy Onee";
-        if(demo.contains("Patient Name") && demo.contains("Physician")){
-            System.out.println("Catch!!!");
+        String stringFromReport = "Medication(s) : Drug1";
+        String medication = "Medication(s) :";
 
-            demo = demo.replace("Patient Name", "");
-            demo = demo.replace("Physician", "");
+        if (stringFromReport.contains(medication)) {
+            String tempStringFromReport = stringFromReport.replace(medication, "");
 
-            List<String> data = Arrays.asList(demo.split(":"));
+            List<String> data = new ArrayList<>();
+            Collections.addAll(data, Arrays.stream(tempStringFromReport.split(",")).toArray(String[]::new));
+
 
             for (int i = 0; i < data.size(); i++) {
                 data.set(i, data.get(i).trim());
@@ -21,6 +28,4 @@ public class SimpleTest {
             data.forEach(System.out::println);
         }
     }
-
-
 }

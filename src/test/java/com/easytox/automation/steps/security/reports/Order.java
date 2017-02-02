@@ -12,23 +12,23 @@ public class Order {
     String receivedInLab;
 
     String compound1Result;
-    String compound1Conclusion;
     String compound1Cutoff;
+    String compound1Concentration;
     String compound1Comments;
 
     String compound2Result;
-    String compound2Conclusion;
     String compound2Cutoff;
+    String compound2Concentration;
     String compound2Comments;
 
-    String vCompound1TestOutcome;
+    String vCompound1Result;
     String vCompound1ReferenceRange;
-    String vCompound1Conclusion;
+    String vCompound1Concentration;
     String vCompound1Comments;
 
-    String vCompound2TestOutcome;
+    String vCompound2Result;
     String vCompound2ReferenceRange;
-    String vCompound2Conclusion;
+    String vCompound2Concentration;
     String vCompound2Comments;
 
     List<String> medications;
@@ -97,12 +97,12 @@ public class Order {
         this.compound1Result = compound1Result;
     }
 
-    public String getCompound1Conclusion() {
-        return compound1Conclusion;
+    public String getCompound1Concentration() {
+        return compound1Concentration;
     }
 
-    public void setCompound1Conclusion(String compound1Conclusion) {
-        this.compound1Conclusion = compound1Conclusion;
+    public void setCompound1Concentration(String compound1Concentration) {
+        this.compound1Concentration = compound1Concentration;
     }
 
     public String getCompound1Cutoff() {
@@ -129,12 +129,12 @@ public class Order {
         this.compound2Result = compound2Result;
     }
 
-    public String getCompound2Conclusion() {
-        return compound2Conclusion;
+    public String getCompound2Concentration() {
+        return compound2Concentration;
     }
 
-    public void setCompound2Conclusion(String compound2Conclusion) {
-        this.compound2Conclusion = compound2Conclusion;
+    public void setCompound2Concentration(String compound2Concentration) {
+        this.compound2Concentration = compound2Concentration;
     }
 
     public String getCompound2Cutoff() {
@@ -153,12 +153,12 @@ public class Order {
         this.compound2Comments = compound2Comments;
     }
 
-    public String getvCompound1TestOutcome() {
-        return vCompound1TestOutcome;
+    public String getvCompound1Result() {
+        return vCompound1Result;
     }
 
-    public void setvCompound1TestOutcome(String vCompound1TestOutcome) {
-        this.vCompound1TestOutcome = vCompound1TestOutcome;
+    public void setvCompound1Result(String vCompound1Result) {
+        this.vCompound1Result = vCompound1Result;
     }
 
     public String getvCompound1ReferenceRange() {
@@ -169,12 +169,12 @@ public class Order {
         this.vCompound1ReferenceRange = vCompound1ReferenceRange;
     }
 
-    public String getvCompound1Conclusion() {
-        return vCompound1Conclusion;
+    public String getvCompound1Concentration() {
+        return vCompound1Concentration;
     }
 
-    public void setvCompound1Conclusion(String vCompound1Conclusion) {
-        this.vCompound1Conclusion = vCompound1Conclusion;
+    public void setvCompound1Concentration(String vCompound1Concentration) {
+        this.vCompound1Concentration = vCompound1Concentration;
     }
 
     public String getvCompound1Comments() {
@@ -185,12 +185,12 @@ public class Order {
         this.vCompound1Comments = vCompound1Comments;
     }
 
-    public String getvCompound2TestOutcome() {
-        return vCompound2TestOutcome;
+    public String getvCompound2Result() {
+        return vCompound2Result;
     }
 
-    public void setvCompound2TestOutcome(String vCompound2TestOutcome) {
-        this.vCompound2TestOutcome = vCompound2TestOutcome;
+    public void setvCompound2Result(String vCompound2Result) {
+        this.vCompound2Result = vCompound2Result;
     }
 
     public String getvCompound2ReferenceRange() {
@@ -201,12 +201,12 @@ public class Order {
         this.vCompound2ReferenceRange = vCompound2ReferenceRange;
     }
 
-    public String getvCompound2Conclusion() {
-        return vCompound2Conclusion;
+    public String getvCompound2Concentration() {
+        return vCompound2Concentration;
     }
 
-    public void setvCompound2Conclusion(String vCompound2Conclusion) {
-        this.vCompound2Conclusion = vCompound2Conclusion;
+    public void setvCompound2Concentration(String vCompound2Concentration) {
+        this.vCompound2Concentration = vCompound2Concentration;
     }
 
     public String getvCompound2Comments() {
@@ -223,5 +223,35 @@ public class Order {
 
     public void setMedications(List<String> medications) {
         this.medications = medications;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "accessionNumber='" + accessionNumber + '\'' +
+                ", patientName='" + patientName + '\'' +
+                ", patientDOB='" + patientDOB + '\'' +
+                ", collectDate='" + collectDate + '\'' +
+                ", physician='" + physician + '\'' +
+                ", sampleType='" + sampleType + '\'' +
+                ", receivedInLab='" + receivedInLab + '\'' +
+                ", compound1Result='" + compound1Result + '\'' +
+                ", compound1Concentration='" + compound1Concentration + '\'' +
+                ", compound1Cutoff='" + compound1Cutoff + '\'' +
+                ", compound1Comments='" + compound1Comments + '\'' +
+                ", compound2Result='" + compound2Result + '\'' +
+                ", compound2Concentration='" + compound2Concentration + '\'' +
+                ", compound2Cutoff='" + compound2Cutoff + '\'' +
+                ", compound2Comments='" + compound2Comments + '\'' +
+                ", vCompound1Result='" + vCompound1Result + '\'' +
+                ", vCompound1ReferenceRange='" + vCompound1ReferenceRange + '\'' +
+                ", vCompound1Concentration='" + vCompound1Concentration + '\'' +
+                ", vCompound1Comments='" + vCompound1Comments + '\'' +
+                ", vCompound2Result='" + vCompound2Result + '\'' +
+                ", vCompound2ReferenceRange='" + vCompound2ReferenceRange + '\'' +
+                ", vCompound2Concentration='" + vCompound2Concentration + '\'' +
+                ", vCompound2Comments='" + vCompound2Comments + '\'' +
+                ", medications=" + medications +
+                '}';
     }
 }

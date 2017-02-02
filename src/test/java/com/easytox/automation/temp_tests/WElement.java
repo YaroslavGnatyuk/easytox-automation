@@ -54,4 +54,6 @@ interface WElement {
     String VCOMPOUND_1_CONCENTRATION ="#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(4) > div > input";
     String VCOMPOUND_2_CONCENTRATION ="#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(4) > div > input";
 
+    String REPORT_DOWNLOAD_ICON = "#caseorder > tbody > tr > td:nth-child(9) > form > a > i";
+
 }

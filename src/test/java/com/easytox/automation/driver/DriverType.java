@@ -67,7 +67,7 @@ public enum DriverType implements DriverSetup {
                 System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver");
             } else {
                 capabilities.setPlatform(Platform.ANY);
-                System.setProperty("webdriver.chrome.driver", "C:/selenium-drivers/chromedriver.exe");
+                System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
             }
             return addProxySettings(capabilities, proxySettings);
         }
