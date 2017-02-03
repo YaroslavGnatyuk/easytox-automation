@@ -2,36 +2,49 @@ package com.easytox.automation.steps.security.reports;
 
 import java.util.List;
 
-public class Order {
-    String accessionNumber;
-    String patientName;
-    String patientDOB;
-    String collectDate;
-    String physician;
-    String sampleType;
-    String receivedInLab;
+public abstract class Order {
+    private String accessionNumber;
+    private String patientName;
+    private String patientDOB;
+    private String collectDate;
+    private String physician;
+    private String sampleType;
+    private String receivedInLab;
 
-    String compound1Result;
-    String compound1Cutoff;
-    String compound1Concentration;
-    String compound1Comments;
+    private String compound1Result;
+    private String compound1Cutoff;
+    private String compound1Concentration;
+    private String compound1Comments;
 
-    String compound2Result;
-    String compound2Cutoff;
-    String compound2Concentration;
-    String compound2Comments;
+    private String compound2Result;
+    private String compound2Cutoff;
+    private String compound2Concentration;
+    private String compound2Comments;
 
-    String vCompound1Result;
-    String vCompound1ReferenceRange;
-    String vCompound1Concentration;
-    String vCompound1Comments;
+    private String vCompound1Result;
+    private String vCompound1ReferenceRange;
+    private String vCompound1Concentration;
+    private String vCompound1Comments;
 
-    String vCompound2Result;
-    String vCompound2ReferenceRange;
-    String vCompound2Concentration;
-    String vCompound2Comments;
+    private String vCompound2Result;
+    private String vCompound2ReferenceRange;
+    private String vCompound2Concentration;
+    private String vCompound2Comments;
 
-    List<String> medications;
+    private List<String> medications;
+
+    private String validationCompound1Result;
+    private String validationCompound1Cutoff;
+    private String validationCompound1Concentration;
+    private String validationCompound1Comments;
+
+    private String validationCompound2Result;
+    private String validationCompound2Cutoff;
+    private String validationCompound2Concentration;
+    private String validationCompound2Comments;
+
+    public Order() {
+    }
 
     public String getAccessionNumber() {
         return accessionNumber;
@@ -95,6 +108,7 @@ public class Order {
 
     public void setCompound1Result(String compound1Result) {
         this.compound1Result = compound1Result;
+        this.validationCompound1Result = compound1Result;
     }
 
     public String getCompound1Concentration() {
@@ -103,6 +117,7 @@ public class Order {
 
     public void setCompound1Concentration(String compound1Concentration) {
         this.compound1Concentration = compound1Concentration;
+        this.validationCompound1Concentration = compound1Concentration;
     }
 
     public String getCompound1Cutoff() {
@@ -111,6 +126,7 @@ public class Order {
 
     public void setCompound1Cutoff(String compound1Cutoff) {
         this.compound1Cutoff = compound1Cutoff;
+        this.validationCompound1Cutoff = compound1Cutoff;
     }
 
     public String getCompound1Comments() {
@@ -119,6 +135,8 @@ public class Order {
 
     public void setCompound1Comments(String compound1Comments) {
         this.compound1Comments = compound1Comments;
+        this.validationCompound1Comments = compound1Comments;
+
     }
 
     public String getCompound2Result() {
@@ -127,6 +145,7 @@ public class Order {
 
     public void setCompound2Result(String compound2Result) {
         this.compound2Result = compound2Result;
+        this.validationCompound2Result = compound2Result;
     }
 
     public String getCompound2Concentration() {
@@ -135,6 +154,7 @@ public class Order {
 
     public void setCompound2Concentration(String compound2Concentration) {
         this.compound2Concentration = compound2Concentration;
+        this.validationCompound2Concentration = compound2Concentration;
     }
 
     public String getCompound2Cutoff() {
@@ -143,6 +163,7 @@ public class Order {
 
     public void setCompound2Cutoff(String compound2Cutoff) {
         this.compound2Cutoff = compound2Cutoff;
+        this.validationCompound2Cutoff = compound2Cutoff;
     }
 
     public String getCompound2Comments() {
@@ -151,6 +172,7 @@ public class Order {
 
     public void setCompound2Comments(String compound2Comments) {
         this.compound2Comments = compound2Comments;
+        this.validationCompound2Comments = compound2Comments;
     }
 
     public String getvCompound1Result() {
@@ -228,30 +250,38 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "accessionNumber='" + accessionNumber + '\'' +
-                ", patientName='" + patientName + '\'' +
-                ", patientDOB='" + patientDOB + '\'' +
-                ", collectDate='" + collectDate + '\'' +
-                ", physician='" + physician + '\'' +
-                ", sampleType='" + sampleType + '\'' +
-                ", receivedInLab='" + receivedInLab + '\'' +
-                ", compound1Result='" + compound1Result + '\'' +
-                ", compound1Concentration='" + compound1Concentration + '\'' +
-                ", compound1Cutoff='" + compound1Cutoff + '\'' +
-                ", compound1Comments='" + compound1Comments + '\'' +
-                ", compound2Result='" + compound2Result + '\'' +
-                ", compound2Concentration='" + compound2Concentration + '\'' +
-                ", compound2Cutoff='" + compound2Cutoff + '\'' +
-                ", compound2Comments='" + compound2Comments + '\'' +
-                ", vCompound1Result='" + vCompound1Result + '\'' +
-                ", vCompound1ReferenceRange='" + vCompound1ReferenceRange + '\'' +
-                ", vCompound1Concentration='" + vCompound1Concentration + '\'' +
-                ", vCompound1Comments='" + vCompound1Comments + '\'' +
-                ", vCompound2Result='" + vCompound2Result + '\'' +
-                ", vCompound2ReferenceRange='" + vCompound2ReferenceRange + '\'' +
-                ", vCompound2Concentration='" + vCompound2Concentration + '\'' +
-                ", vCompound2Comments='" + vCompound2Comments + '\'' +
+                "accessionNumber='" + accessionNumber + '\n' +
+                ", patientName='" + patientName + '\n' +
+                ", patientDOB='" + patientDOB + '\n' +
+                ", collectDate='" + collectDate + '\n' +
+                ", physician='" + physician + '\n' +
+                ", sampleType='" + sampleType + '\n' +
+                ", receivedInLab='" + receivedInLab + '\n' +
+                ", compound1Result='" + compound1Result + '\n' +
+                ", compound1Cutoff='" + compound1Cutoff + '\n' +
+                ", compound1Concentration='" + compound1Concentration + '\n' +
+                ", compound1Comments='" + compound1Comments + '\n' +
+                ", compound2Result='" + compound2Result + '\n' +
+                ", compound2Cutoff='" + compound2Cutoff + '\n' +
+                ", compound2Concentration='" + compound2Concentration + '\n' +
+                ", compound2Comments='" + compound2Comments + '\n' +
+                ", vCompound1Result='" + vCompound1Result + '\n' +
+                ", vCompound1ReferenceRange='" + vCompound1ReferenceRange + '\n' +
+                ", vCompound1Concentration='" + vCompound1Concentration + '\n' +
+                ", vCompound1Comments='" + vCompound1Comments + '\n' +
+                ", vCompound2Result='" + vCompound2Result + '\n' +
+                ", vCompound2ReferenceRange='" + vCompound2ReferenceRange + '\n' +
+                ", vCompound2Concentration='" + vCompound2Concentration + '\n' +
+                ", vCompound2Comments='" + vCompound2Comments + '\n' +
                 ", medications=" + medications +
+                ", validationCompound1Result='" + validationCompound1Result + '\n' +
+                ", validationCompound1Cutoff='" + validationCompound1Cutoff + '\n' +
+                ", validationCompound1Concentration='" + validationCompound1Concentration + '\n' +
+                ", validationCompound1Comments='" + validationCompound1Comments + '\n' +
+                ", validationCompound2Result='" + validationCompound2Result + '\n' +
+                ", validationCompound2Cutoff='" + validationCompound2Cutoff + '\n' +
+                ", validationCompound2Concentration='" + validationCompound2Concentration + '\n' +
+                ", validationCompound2Comments='" + validationCompound2Comments + '\n' +
                 '}';
     }
 }

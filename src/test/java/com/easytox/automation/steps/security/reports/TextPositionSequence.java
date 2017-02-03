@@ -5,9 +5,6 @@ import org.apache.pdfbox.util.TextPosition;
 
 import java.util.List;
 
-/**
- * Created by yroslav on 1/30/17.
- */
 public class TextPositionSequence implements CharSequence {
     private final List<TextPosition> textPositions;
     private final int start, end;
