@@ -4,8 +4,6 @@ import com.easytox.automation.steps.security.reports.PDFOrder;
 import com.easytox.automation.steps.security.reports.WebOrder;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -21,18 +19,22 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class MyTest {
-    //linux path - /home/yroslav/temp, windows - C:\easy_tox_temp\
+import static org.junit.Assert.assertTrue;
+
+public class VerifyReportTest {
+    /** linux path is /home/user/temp, windows is C:\easy_tox_temp\ **/
     private static final String downloadFilepath = "/home/yroslav/temp";
+//    private static final String downloadFilepath = "C:\\easy_tox_temp\\";
+
     private static final String easytoxAddress = "http://bmtechsol.com:8080/easytox/";
 
-    private Logger log = Logger.getLogger(MyTest.class);
-
-
+    private Logger log = Logger.getLogger(VerifyReportTest.class);
     private WebDriver driver;
     private WebDriverWait wait;
 
-    @Before
+    private PDFOrder pdfOrder;
+    private WebOrder webOrder;
+
     public void init() {
         System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
 //        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
@@ -47,44 +49,59 @@ public class MyTest {
     }
 
     @Test
-    public void entryPoint() { // I'm on cases page
+    public void entryPoint() {
 
         try {
+
+            init();
             driver.findElement(By.name("j_username")).sendKeys("PathOne");
             driver.findElement(By.name("j_password")).sendKeys("Test@123");
             driver.findElement(By.cssSelector("button.btn.btn-md.btn-primary")).click();
             Thread.sleep(1500);
 
-            String caseAccession = "AA17-050";
+            String caseAccession = "AA17-135";
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
             Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.REPORT_DOWNLOAD_ICON)).click();
             Thread.sleep(1000);
-            PDDocument order = readPDFWithOrder(caseAccession);
-            PDFOrder pdfOrder= new PDFOrder(order);
-            pdfOrder = pdfOrder.getOrderFromPDF();
+            PDDocument order = readPDFWithOrder();
+            pdfOrder = new PDFOrder(order);
+            pdfOrder = pdfOrder.fillAllFields();
 
             driver.findElement(By.cssSelector("#caseorder_filter > label > input")).clear();
             driver.findElement(By.cssSelector("#caseorder_filter > label > input")).sendKeys(caseAccession);
             Thread.sleep(1000);
             driver.findElement(By.id("editlink")).click();
             Thread.sleep(1000);
-            WebOrder webOrder = new WebOrder(driver, caseAccession);
+            webOrder = new WebOrder(driver, caseAccession);
             webOrder = webOrder.getOrderFromWeb();
+            close();
 
-            log.info(" From PDF: " + pdfOrder + "\n");
-            log.info(" From Web: " + webOrder + "\n");
+            log.info(webOrder);
+            log.info(pdfOrder);
+            log.info(pdfOrder.getContentFromReport());
+
+            assertTrue(pdfOrder.isPositionOfLabNameAndLabAddressValid());
+            assertTrue(verifyDit());
+
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.info(e);
         }
     }
 
-    private PDDocument readPDFWithOrder(String accessionNumber) {
-        PDDocument report = downloadReport(accessionNumber);
-        deleteTempDirAndInnerFiles(downloadFilepath);
-
-        return report;
+    private boolean verifyDit() {
+        if (pdfOrder.getAccessionNumber().equals(webOrder.getAccessionNumber()) &&
+                pdfOrder.getPatientName().equals(webOrder.getPatientName()) &&
+                pdfOrder.getPatientDOB().equals(webOrder.getPatientDOB()) &&
+                pdfOrder.getCollectDate().equals(webOrder.getCollectDate()) &&
+                pdfOrder.getPhysician().equals(webOrder.getPhysician()) &&
+                pdfOrder.getSampleType().equals(webOrder.getSampleType()) &&
+                pdfOrder.getReceivedInLab().equals(webOrder.getReceivedInLab())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private DesiredCapabilities getChromePreferences() {
@@ -104,7 +121,14 @@ public class MyTest {
         return cap;
     }
 
-    private PDDocument downloadReport(String accessionNumber) {
+    private PDDocument readPDFWithOrder() {
+        PDDocument report = downloadReport();
+        deleteTempDirAndInnerFiles(downloadFilepath);
+
+        return report;
+    }
+
+    private PDDocument downloadReport() {
         try {
             createTempDir(downloadFilepath);
 
@@ -150,8 +174,8 @@ public class MyTest {
         return files.get(0);
     }
 
-    @After
-    public void close() {
+    private void close() {
         driver.close();
     }
+
 }

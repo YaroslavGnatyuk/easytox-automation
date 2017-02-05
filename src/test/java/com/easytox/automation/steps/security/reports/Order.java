@@ -250,38 +250,38 @@ public abstract class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "accessionNumber='" + accessionNumber + '\n' +
-                ", patientName='" + patientName + '\n' +
-                ", patientDOB='" + patientDOB + '\n' +
-                ", collectDate='" + collectDate + '\n' +
-                ", physician='" + physician + '\n' +
-                ", sampleType='" + sampleType + '\n' +
-                ", receivedInLab='" + receivedInLab + '\n' +
-                ", compound1Result='" + compound1Result + '\n' +
-                ", compound1Cutoff='" + compound1Cutoff + '\n' +
-                ", compound1Concentration='" + compound1Concentration + '\n' +
-                ", compound1Comments='" + compound1Comments + '\n' +
-                ", compound2Result='" + compound2Result + '\n' +
-                ", compound2Cutoff='" + compound2Cutoff + '\n' +
-                ", compound2Concentration='" + compound2Concentration + '\n' +
-                ", compound2Comments='" + compound2Comments + '\n' +
-                ", vCompound1Result='" + vCompound1Result + '\n' +
-                ", vCompound1ReferenceRange='" + vCompound1ReferenceRange + '\n' +
-                ", vCompound1Concentration='" + vCompound1Concentration + '\n' +
-                ", vCompound1Comments='" + vCompound1Comments + '\n' +
-                ", vCompound2Result='" + vCompound2Result + '\n' +
-                ", vCompound2ReferenceRange='" + vCompound2ReferenceRange + '\n' +
-                ", vCompound2Concentration='" + vCompound2Concentration + '\n' +
-                ", vCompound2Comments='" + vCompound2Comments + '\n' +
+                "accessionNumber='" + accessionNumber + '\'' +
+                ", patientName='" + patientName + '\'' +
+                ", patientDOB='" + patientDOB + '\'' +
+                ", collectDate='" + collectDate + '\'' +
+                ", physician='" + physician + '\'' +
+                ", sampleType='" + sampleType + '\'' +
+                ", receivedInLab='" + receivedInLab + '\'' +
+                ", compound1Result='" + compound1Result + '\'' +
+                ", compound1Cutoff='" + compound1Cutoff + '\'' +
+                ", compound1Concentration='" + compound1Concentration + '\'' +
+                ", compound1Comments='" + compound1Comments + '\'' +
+                ", compound2Result='" + compound2Result + '\'' +
+                ", compound2Cutoff='" + compound2Cutoff + '\'' +
+                ", compound2Concentration='" + compound2Concentration + '\'' +
+                ", compound2Comments='" + compound2Comments + '\'' +
+                ", vCompound1Result='" + vCompound1Result + '\'' +
+                ", vCompound1ReferenceRange='" + vCompound1ReferenceRange + '\'' +
+                ", vCompound1Concentration='" + vCompound1Concentration + '\'' +
+                ", vCompound1Comments='" + vCompound1Comments + '\'' +
+                ", vCompound2Result='" + vCompound2Result + '\'' +
+                ", vCompound2ReferenceRange='" + vCompound2ReferenceRange + '\'' +
+                ", vCompound2Concentration='" + vCompound2Concentration + '\'' +
+                ", vCompound2Comments='" + vCompound2Comments + '\'' +
                 ", medications=" + medications +
-                ", validationCompound1Result='" + validationCompound1Result + '\n' +
-                ", validationCompound1Cutoff='" + validationCompound1Cutoff + '\n' +
-                ", validationCompound1Concentration='" + validationCompound1Concentration + '\n' +
-                ", validationCompound1Comments='" + validationCompound1Comments + '\n' +
-                ", validationCompound2Result='" + validationCompound2Result + '\n' +
-                ", validationCompound2Cutoff='" + validationCompound2Cutoff + '\n' +
-                ", validationCompound2Concentration='" + validationCompound2Concentration + '\n' +
-                ", validationCompound2Comments='" + validationCompound2Comments + '\n' +
+                ", validationCompound1Result='" + validationCompound1Result + '\'' +
+                ", validationCompound1Cutoff='" + validationCompound1Cutoff + '\'' +
+                ", validationCompound1Concentration='" + validationCompound1Concentration + '\'' +
+                ", validationCompound1Comments='" + validationCompound1Comments + '\'' +
+                ", validationCompound2Result='" + validationCompound2Result + '\'' +
+                ", validationCompound2Cutoff='" + validationCompound2Cutoff + '\'' +
+                ", validationCompound2Concentration='" + validationCompound2Concentration + '\'' +
+                ", validationCompound2Comments='" + validationCompound2Comments + '\'' +
                 '}';
     }
 }

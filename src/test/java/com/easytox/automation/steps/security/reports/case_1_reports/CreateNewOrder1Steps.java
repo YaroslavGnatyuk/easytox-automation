@@ -1,22 +1,31 @@
 package com.easytox.automation.steps.security.reports.case_1_reports;
 
-import com.easytox.automation.driver.DriverBase;
+import com.easytox.automation.steps.security.reports.PDFOrder;
+import com.easytox.automation.steps.security.reports.WebOrder;
 import cucumber.api.java.After;
-import com.easytox.automation.steps.security.reports.Order;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,10 +34,13 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-public class CreateNewOrderSteps1 {
+public class CreateNewOrder1Steps {
     private WebDriver driver;
     private WebDriverWait wait;
-    private Logger log = Logger.getLogger(CreateNewOrderSteps1.class);
+    private Logger log = Logger.getLogger(CreateNewOrder1Steps.class);
+
+    //linux path - /home/yroslav/temp, windows - C:\easy_tox_temp\
+    private static final String downloadFilepath = "/home/yroslav/temp";
     private static final String LOGIN_URL = "http://bmtechsol.com:8080/easytox/";
     private static final String ERROR_IN_LOGIN_URL = "http://bmtechsol.com:8080/easytox/?login_error=1&format=";
     private static final String CREATE_NEW_ORDER_URL = "http://bmtechsol.com:8080/easytox/orderFrom/create";
@@ -37,16 +49,23 @@ public class CreateNewOrderSteps1 {
     private String caseAccession = null;
     private String newOrder = null;
 
-    private Order orderFromWebPage;
-    private Order orderFromPDF;
+    private PDFOrder pdfOrder;
+    private WebOrder webOrder;
 
     @Before
     public void init() {
-        DriverBase.instantiateDriverObject();
+        /*DriverBase.instantiateDriverObject();
         driver = DriverBase.getDriver();
         driver.manage().window().maximize();
 
-        wait = new WebDriverWait(driver, 15);
+        wait = new WebDriverWait(driver, 15);*/
+
+        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
+//        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+        DesiredCapabilities capabilities = getChromePreferences();
+        driver = new ChromeDriver(capabilities);
+        driver.manage().window().maximize();
+        wait = new WebDriverWait(driver, 35);
     }
 
     @When("^Login to Easytox with \"([^\"]*)\" and \"([^\"]*)\" credentials.$")
@@ -658,5 +677,75 @@ public class CreateNewOrderSteps1 {
     @After
     public void close() {
         driver.close();
+    }
+
+    private DesiredCapabilities getChromePreferences() {
+        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        chromePrefs.put("profile.default_content_settings.popups", 0);
+        chromePrefs.put("download.default_directory", downloadFilepath);
+
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("prefs", chromePrefs);
+        options.addArguments("test-type");
+
+        DesiredCapabilities cap = DesiredCapabilities.chrome();
+        cap.setCapability("chrome.binary", "./drivers/chromedriver.exe");
+        cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        cap.setCapability(ChromeOptions.CAPABILITY, options);
+
+        return cap;
+    }
+
+    private PDDocument readPDFWithOrder() {
+        PDDocument report = downloadReport();
+        deleteTempDirAndInnerFiles(downloadFilepath);
+
+        return report;
+    }
+
+    private PDDocument downloadReport() {
+        try {
+            createTempDir(downloadFilepath);
+
+            String reportPath = getPDFFile(downloadFilepath).getPath();
+            return PDDocument.load(reportPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void createTempDir(String path) {
+        File dir = new File(path);
+        if (!dir.exists()) {
+            if (dir.mkdir()) {
+                log.info("Directory have created");
+            } else {
+                log.info("Directory have not created");
+            }
+        }
+    }
+
+    private void deleteTempDirAndInnerFiles(String path) {
+        File dir = new File(path);
+        if (dir.exists()) {
+
+            File[] allFiles = dir.listFiles();
+            if (allFiles != null && allFiles.length != 0) {
+                Arrays.stream(allFiles).forEach(File::delete);
+            }
+
+            if (dir.delete()) {
+                System.out.println("Directory have deleted");
+            } else {
+                System.out.println("Directory have not deleted");
+            }
+        }
+    }
+
+    private File getPDFFile(String path) {
+        File dir = new File(path);
+        List<File> files = Arrays.asList(dir.listFiles());
+        return files.get(0);
     }
 }

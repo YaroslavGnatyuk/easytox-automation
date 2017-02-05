@@ -18,12 +18,12 @@ public class PDFOrder extends Order {
     public PDFOrder() {
     }
 
-    public PDFOrder(PDDocument order){
+    public PDFOrder(PDDocument order) {
         this.order = order;
     }
 
-    public PDFOrder getOrderFromPDF() {
-        String content = getContentFromReport(order);
+    public PDFOrder fillAllFields() {
+        String content = getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
         log.info(stringsFromReport.size());
         this.parseStringsFromReport(stringsFromReport);
@@ -177,9 +177,15 @@ public class PDFOrder extends Order {
                 data.set(i, data.get(i).trim());
             }
 
-            super.setPatientName(data.get(1));
+            super.setPatientName(correctPatientName(data.get(1)));
             super.setPhysician(data.get(2));
         }
+    }
+
+    private String correctPatientName(String patientName) {
+        int firstName = 0, lastName = 1;
+        String[] name = patientName.split("  ");
+        return patientName = name[firstName] + " " + name[lastName];
     }
 
     private void setAccession(final String stringFromReport) {
@@ -229,19 +235,22 @@ public class PDFOrder extends Order {
         }
     }
 
-    private String getContentFromReport(PDDocument report) {
+    public String getContentFromReport() {
         try {
             PDFTextStripper printer = new PDFTextStripper();
             printer.setSortByPosition(true);
 
-            return printer.getText(report);
+            return printer.getText(this.order);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public void checkPositionOfLabNameAndLabAddress() {
+    public boolean isPositionOfLabNameAndLabAddressValid() {
+        int validXCoordinate = 350;
+        int validYCoordinate = 80;
+
         String labName = "Sujana LabOne";
         String labAddressLine1 = "1234 Tuttles park drive Dublin";
         String labAddressLine2 = "Ohio USA 43016";
@@ -254,14 +263,18 @@ public class PDFOrder extends Order {
             List<TextPositionSequence> posLabAddress2 = findSubWords(this.order, 1, labAddressLine2);
             List<TextPositionSequence> posLabAddress3 = findSubWords(this.order, 1, labAddressLine3);
 
-            System.out.println(posLabName.get(0).getX() + "   " + posLabName.get(0).getY());
-            System.out.println(posLabAddress1.get(0).getX() + "   " + posLabAddress1.get(0).getY());
-            System.out.println(posLabAddress1.get(0).getX() + "   " + posLabAddress2.get(0).getY());
-            System.out.println(posLabAddress1.get(0).getX() + "   " + posLabAddress3.get(0).getY());
+            if ((posLabName.get(0).getX() > 350 && posLabName.get(0).getY() < 80) &&
+                    (posLabAddress1.get(0).getX() > validXCoordinate && posLabAddress1.get(0).getY() < validYCoordinate) &&
+                    (posLabAddress2.get(0).getX() > validXCoordinate && posLabAddress2.get(0).getY() < validYCoordinate) &&
+                    (posLabAddress3.get(0).getX() > validXCoordinate && posLabAddress3.get(0).getY() < validYCoordinate)) {
+                return true;
+            } else {
+                return false;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return false;
     }
 
     static List<TextPositionSequence> findSubWords(PDDocument document, int page, String searchTerm) throws IOException {
@@ -287,4 +300,6 @@ public class PDFOrder extends Order {
         stripper.getText(document);
         return hits;
     }
+
+
 }
