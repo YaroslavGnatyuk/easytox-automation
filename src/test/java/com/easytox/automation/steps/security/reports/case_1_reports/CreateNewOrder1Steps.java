@@ -33,14 +33,16 @@ import java.util.stream.Collectors;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class CreateNewOrder1Steps {
     private WebDriver driver;
     private WebDriverWait wait;
     private Logger log = Logger.getLogger(CreateNewOrder1Steps.class);
 
-    //linux path - /home/yroslav/temp, windows - C:\easy_tox_temp\
-    private static final String downloadFilepath = "/home/yroslav/temp";
+    //    private static final String downloadFilepath = "/home/yroslav/temp";
+    private static final String downloadFilepath = "C:\\easy_tox_temp\\";
+
     private static final String LOGIN_URL = "http://bmtechsol.com:8080/easytox/";
     private static final String ERROR_IN_LOGIN_URL = "http://bmtechsol.com:8080/easytox/?login_error=1&format=";
     private static final String CREATE_NEW_ORDER_URL = "http://bmtechsol.com:8080/easytox/orderFrom/create";
@@ -54,14 +56,8 @@ public class CreateNewOrder1Steps {
 
     @Before
     public void init() {
-        /*DriverBase.instantiateDriverObject();
-        driver = DriverBase.getDriver();
-        driver.manage().window().maximize();
-
-        wait = new WebDriverWait(driver, 15);*/
-
-        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
-//        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+//        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
+        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
         DesiredCapabilities capabilities = getChromePreferences();
         driver = new ChromeDriver(capabilities);
         driver.manage().window().maximize();
@@ -84,6 +80,7 @@ public class CreateNewOrder1Steps {
 
             new Select(driver.findElement(By.cssSelector(WElement.AMOUNT_OF_RECORDS_PER_ONE_PAGE)))
                     .selectByVisibleText("All");
+            Thread.sleep(500);
             totalRecordsInOrderListBeforeCreationNewOrder = driver
                     .findElements(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
                     .size();
@@ -345,7 +342,7 @@ public class CreateNewOrder1Steps {
 
             new Select(driver.findElement(By.cssSelector(WElement.AMOUNT_OF_RECORDS_PER_ONE_PAGE)))
                     .selectByVisibleText("All");
-            Thread.sleep(1000);
+            Thread.sleep(1500);
             int totalRecordsInOrderListAfterCreationNewOrder = driver
                     .findElements(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
                     .size();
@@ -569,6 +566,7 @@ public class CreateNewOrder1Steps {
             int indexOfColumnWithStatus = 6;
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
+            Thread.sleep(300);
             String statusWeHave = driver.findElement(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
                     .findElements(By.cssSelector(WElement.ONE_COLUMN_IN_ROW))
                     .get(indexOfColumnWithStatus)
@@ -581,7 +579,7 @@ public class CreateNewOrder1Steps {
 
     @When("^Select 'Tasks' from the top menu.$")
     public void selectTasks() {
-        driver.findElement(By.cssSelector(WElement.TASKS)).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(WElement.TASKS))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("See All Cases"))).click();
     }
 
@@ -655,7 +653,7 @@ public class CreateNewOrder1Steps {
                 .sendKeys(caseAccession);
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -672,11 +670,286 @@ public class CreateNewOrder1Steps {
      * Verify Report
      **/
 
-    
+    @When("^Click on PDF icon under 'Report' column of finalized case.$")
+    public void clickOnPDFIcon() {
+        try {
+            createTempDir(downloadFilepath);
+            driver.findElement(By.cssSelector(WElement.REPORT_DOWNLOAD_ICON)).click();
+            Thread.sleep(1000);
+            PDDocument order = readPDFWithOrder();
+            pdfOrder = new PDFOrder(order);
+            pdfOrder = pdfOrder.fillAllFields();
+
+            driver.findElement(By.id("editlink")).click();
+            webOrder = new WebOrder(driver, caseAccession);
+            webOrder = webOrder.getOrderFromWeb();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Then("^Report should be opened in the PDF format.$")
+    public void checkFormatTheReport() {
+        assertTrue(pdfOrder.getOrder() != null);
+    }
+
+    @When("^Verify the details displayed in the report.$")
+    public void verifyLabNameAndLabAddressInTheReport() {
+        String labName = "Sujana LabOne";
+        String labAddressLine1 = "1234 Tuttles park drive Dublin";
+        String labAddressLine2 = "Ohio USA 43016";
+        String labAddressLine3 = "Lab Director:     CLIA ID:";
+
+        String allTextFromReport = pdfOrder.getContentFromReport();
+        assertTrue(allTextFromReport.contains(labName) &&
+                allTextFromReport.contains(labAddressLine1) &&
+                allTextFromReport.contains(labAddressLine2) &&
+                allTextFromReport.contains(labAddressLine3));
+    }
+
+    @Then("^Lab Name along with lab address should be displayed on the top right of the screen.$")
+    public void checkPositionOfLabNameAndLabAddress() {
+        assertTrue(pdfOrder.isPositionOfLabNameAndLabAddressValid());
+    }
+
+    @When("^Verify the details of order displayed in the report.$")
+    public void checkDetails() {
+        assertTrue(pdfOrder.getAccessionNumber() != null &&
+                pdfOrder.getPatientName() != null &&
+                pdfOrder.getPatientDOB() != null &&
+                pdfOrder.getCollectDate() != null &&
+                pdfOrder.getPhysician() != null &&
+                pdfOrder.getSampleType() != null &&
+                pdfOrder.getReceivedInLab() != null);
+    }
+
+    @Then("^Following details should be displayed in the report: Accession Number: Value should match the data entered on Case entry$")
+    public void checkAccessionNumber() {
+        assertTrue(pdfOrder.getAccessionNumber().equals(webOrder.getAccessionNumber()));
+    }
+
+    @And("^Patient Name: Value should match the data entered on Case entry$")
+    public void checkPatientName() {
+        assertTrue(pdfOrder.getPatientName().equals(webOrder.getPatientName()));
+    }
+
+    @And("^Patient DOB: Value should match the data entered on Case entry$")
+    public void checkPatientDOB() {
+        assertTrue(pdfOrder.getPatientDOB().equals(webOrder.getPatientDOB()));
+    }
+
+    @And("^Collected Date: Value should match the data entered on Case entry$")
+    public void checkCollectedDate() {
+        assertTrue(pdfOrder.getCollectDate().equals(webOrder.getCollectDate()));
+    }
+
+    @And("^Physician: Value should match the data entered on Case entry$")
+    public void checkPhysician() {
+        assertTrue(pdfOrder.getPhysician().equals(webOrder.getPhysician()));
+    }
+
+    @And("^Sample Type: Value should match the data entered on Case entry$")
+    public void checkSampleType() {
+        assertTrue(pdfOrder.getSampleType().equals(webOrder.getSampleType()));
+    }
+
+    @And("^Received in Lab: Value should match the data entered on Case entry$")
+    public void checkReceivedInLab() {
+        assertTrue(pdfOrder.getReceivedInLab().equals(webOrder.getReceivedInLab()));
+    }
+
+    @When("^Verify the details displayed in \"([^\"]*)\" section.$")
+    public void findConsistentResultsReportedMedicationDetected(String section) {
+        String allTextFromReport = pdfOrder.getContentFromReport();
+        assertTrue(allTextFromReport.contains(section));
+    }
+
+    @Then("^Following details should be displayed Compound1 Result - \"([^\"]*)\"$")
+    public void checkCompound1Result(String resultShouldBe) {
+        String content = pdfOrder.getContentFromReport();
+        String consistentResult = "Consistent Results-Reported Medication Detected";
+        String inconsistentResult = "Inconsistent Results - Unexpected Positives";
+
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+
+        if (stringsFromReport.contains(consistentResult) && stringsFromReport.contains(inconsistentResult)) {
+            for (int i = 0; i < stringsFromReport.size(); i++) {
+                if (i > stringsFromReport.indexOf(consistentResult) &&
+                        i < stringsFromReport.indexOf(inconsistentResult)) {
+                    if (stringsFromReport.get(i).contains("Compound1 ")) {
+                        assertTrue(pdfOrder.getCompound1Result().equals(resultShouldBe));
+                    }
+                }
+            }
+        } else {
+            fail("Didn't find Compound1 result");
+        }
+    }
+
+    @And("^Conc. - <Value entered on Case Entry>$")
+    public void checkCompound1Concentration() {
+        log.info(pdfOrder.getCompound1Concentration()+"\n");
+        log.info(webOrder.getCompound1Concentration()+"\n");
+        assertTrue(pdfOrder.getCompound1Concentration().equals(webOrder.getCompound1Concentration()));
+    }
+
+    @And("^Detetction Window Cutoff - <Valueentered on Case Entry>$")
+    public void checkCompound1Cutoff() {
+        assertTrue(pdfOrder.getCompound1Cutoff().equals(webOrder.getCompound1Cutoff()));
+    }
+
+    @And("^Comments - \"([^\"]*)\"$")
+    public void checkCompound1Comment(String comment) {
+        assertTrue(pdfOrder.getCompound1Comments().equals(comment));
+    }
+
+    @When("^Verify the details displayed in \"([^\"]*)\" section for compound2.$")
+    public void findInconsistentResultsUnexpectedPositives(String section) {
+        String allTextFromReport = pdfOrder.getContentFromReport();
+        assertTrue(allTextFromReport.contains(section));
+    }
+
+    @Then("^Following details should be displayed:Compound2 Result - \"([^\"]*)\"$")
+    public void checkResultInCompound2(String resultShouldBe) {
+        String content = pdfOrder.getContentFromReport();
+        String inconsistentResult = "Inconsistent Results - Unexpected Positives";
+        String specimen = "SPECIMEN VALIDITY TESTING";
+
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+
+        if (stringsFromReport.contains(specimen) && stringsFromReport.contains(inconsistentResult)) {
+            for (int i = 0; i < stringsFromReport.size(); i++) {
+                if (i < stringsFromReport.indexOf(specimen) &&
+                        i > stringsFromReport.indexOf(inconsistentResult)) {
+                    if (stringsFromReport.get(i).contains("Compound2 ")) {
+                        assertTrue(pdfOrder.getCompound2Result().equals(resultShouldBe));
+                    }
+                }
+            }
+        } else {
+            fail("Didn't find Compound2 result");
+        }
+    }
+
+    @And("^Compound2 Conc. - <Value entered on Case Entry>$")
+    public void checkCompound2Concentration() {
+        assertTrue(pdfOrder.getCompound2Concentration().equals(webOrder.getCompound2Concentration()));
+    }
+
+    @And("^Compound2 Cutoff - <Value entered on Case Entry>$")
+    public void checkCompound2Cutoff() {
+        assertTrue(pdfOrder.getCompound2Cutoff().equals(webOrder.getCompound2Cutoff()));
+    }
+
+    @And("^Compound2 Comments - \"([^\"]*)\"$")
+    public void checkCompound2Comment(String comment) {
+        assertTrue(pdfOrder.getCompound2Comments().equals(comment));
+    }
+
+    @When("^Verify the details displayed in \"([^\"]*)\" section for VCompound.$")
+    public void findSpecimenValidityTestingSection(String section) {
+        String allTextFromReport = pdfOrder.getContentFromReport();
+        assertTrue(allTextFromReport.contains(section));
+    }
+
+    @Then("^Data entered in this section should be same as during Case Entry.$")
+    public void verifyDataInSpecimenValidityTestingSection() {
+        String content = pdfOrder.getContentFromReport();
+        String specimen = "SPECIMEN VALIDITY TESTING";
+        String medication = "Medication(s) :";
+
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+
+        if (content.contains(specimen) && content.contains(medication)) {
+            for (int i = 0; i < stringsFromReport.size(); i++) {
+                if (i < stringsFromReport.indexOf(medication) &&
+                        i > stringsFromReport.indexOf(specimen)) {
+                    if (stringsFromReport.get(i).contains("VCompound1 ")) {
+                        assertTrue(pdfOrder.getvCompound1Comments().equals(webOrder.getvCompound1Comments()) &&
+                                pdfOrder.getvCompound1Concentration().equals(webOrder.getvCompound1Concentration()) &&
+                                pdfOrder.getvCompound1ReferenceRange().equals(webOrder.getvCompound1ReferenceRange()) &&
+                                pdfOrder.getvCompound1Result().equals(webOrder.getvCompound1Result()));
+                    }
+
+                    if (stringsFromReport.get(i).contains("VCompound2 ")) {
+                        assertTrue(pdfOrder.getvCompound2Comments().equals(webOrder.getvCompound2Comments()) &&
+                                pdfOrder.getvCompound2Concentration().equals(webOrder.getvCompound2Concentration()) &&
+                                pdfOrder.getvCompound2ReferenceRange().equals(webOrder.getvCompound2ReferenceRange()) &&
+                                pdfOrder.getvCompound2Result().equals(webOrder.getvCompound2Result()));
+                    }
+                }
+            }
+        } else {
+            fail("Didn't find VCompound1 or VCompound2 result");
+        }
+    }
+
+    @When("^Verify \"([^\"]*)\"$")
+    public void checkMedications(String section) {
+        String allTextFromReport = pdfOrder.getContentFromReport();
+        assertTrue(allTextFromReport.contains(section));
+    }
+
+    @Then("^\"([^\"]*)\" should be displayed under 'Medications'.$")
+    public void checkSelectedMedication(String medication) {
+        if (pdfOrder.getMedications().size() == 1) {
+            assertTrue(pdfOrder.getMedications().get(0).equals(medication));
+        } else {
+            fail("Not correct amount of medications");
+        }
+    }
+
+    @When("^Verify details from 'Test Screen Validation' section are displayed.$")
+    public void checkTestScreenValidationSection(){
+
+    }
+
+    @Then("^Details from 'Test Screen Validation' section in the case entry should be displayed.$")
+    public void checkDetailInTestScreenValidationSection(){
+        String content = pdfOrder.getContentFromReport();
+        String signedDate = "Signed Date: ";
+        String medication = "Medication(s) :";
+
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+
+        if (content.contains(signedDate) && content.contains(medication)) {
+            for (int i = 0; i < stringsFromReport.size(); i++) {
+                if (i < stringsFromReport.indexOf(signedDate) &&
+                        i > stringsFromReport.indexOf(medication)) {
+                    if (stringsFromReport.get(i).contains("Compound1")) {
+                        assertTrue(pdfOrder.getValidationCompound1Comments().equals(webOrder.getCompound1Comments()) &&
+                                pdfOrder.getValidationCompound1Concentration().equals(webOrder.getCompound1Concentration()) &&
+                                pdfOrder.getValidationCompound1Cutoff().equals(webOrder.getCompound1Cutoff()) &&
+                                pdfOrder.getValidationCompound1Result().equals(webOrder.getCompound1Result()));
+                    }
+
+                    if (stringsFromReport.get(i).contains("Compound2")) {
+                        assertTrue(pdfOrder.getValidationCompound2Comments().equals(webOrder.getCompound2Comments()) &&
+                                pdfOrder.getValidationCompound2Concentration().equals(webOrder.getCompound2Concentration()) &&
+                                pdfOrder.getValidationCompound2Cutoff().equals(webOrder.getCompound2Cutoff()) &&
+                                pdfOrder.getValidationCompound2Result().equals(webOrder.getCompound2Result()));
+                    }
+                }
+            }
+        } else {
+            fail("Didn't find VCompound1 or VCompound2 result");
+        }
+    }
+
+    @When("^Verify Signature$")
+    public void verifySignature(){
+        assertTrue(pdfOrder.isReportIsSigned());
+    }
+
+    @Then("^Signature of Pathologist along with Signed Date should be displayed.$")
+    public void verifySignedDate(){
+        assertNotNull(pdfOrder.getSignedDate());
+    }
 
     @After
     public void close() {
         driver.close();
+        driver.quit();
     }
 
     private DesiredCapabilities getChromePreferences() {
@@ -705,8 +978,6 @@ public class CreateNewOrder1Steps {
 
     private PDDocument downloadReport() {
         try {
-            createTempDir(downloadFilepath);
-
             String reportPath = getPDFFile(downloadFilepath).getPath();
             return PDDocument.load(reportPath);
         } catch (IOException e) {

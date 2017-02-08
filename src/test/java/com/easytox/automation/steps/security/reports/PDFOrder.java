@@ -2,18 +2,21 @@ package com.easytox.automation.steps.security.reports;
 
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObject;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PDFOrder extends Order {
     private PDDocument order;
-    private static final Logger log = Logger.getLogger(Order.class);
+    private String signedDate;
+    private boolean reportIsSigned;
+    private static final Logger log = Logger.getLogger(PDFOrder.class);
 
     public PDFOrder() {
     }
@@ -24,14 +27,14 @@ public class PDFOrder extends Order {
 
     public PDFOrder fillAllFields() {
         String content = getContentFromReport();
-        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-        log.info(stringsFromReport.size());
-        this.parseStringsFromReport(stringsFromReport);
+
+        this.parseStringsFromReport(content);
 
         return this;
     }
 
-    private void parseStringsFromReport(List<String> stringsFromReport) {
+    private void parseStringsFromReport(String content) {
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
         for (String stringFromReport : stringsFromReport) {
             this.setPatientNameAndPhysician(stringFromReport);
             this.setAccession(stringFromReport);
@@ -42,6 +45,89 @@ public class PDFOrder extends Order {
             this.setVCompound1(stringFromReport);
             this.setVCompound2(stringFromReport);
             this.setMedication(stringFromReport);
+            this.setValidationCompound1And2(content);
+            this.setSignedDate(stringFromReport);
+            this.isReportSigned();
+        }
+    }
+
+    private void setSignedDate(final String stringFromReport) {
+        String signedDate = "Signed Date: ";
+        if (stringFromReport.contains(signedDate)) {
+            List<String> data = Arrays.stream(stringFromReport.split(":"))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
+            int indexOfDate = 1;
+            this.signedDate = data.get(indexOfDate);
+        }
+    }
+
+    private void isReportSigned(){
+        try {
+            PDFTextStripper parser = new PDFTextStripper();
+            parser.setSortByPosition(true);
+            parser.getText(order);
+            PDPage page = parser.getCurrentPage();
+            PDResources resources = page.getResources();
+            Map<String, PDXObject> images = resources.getXObjects();
+            if (!images.isEmpty()){
+                reportIsSigned = true;
+            }else{
+                reportIsSigned = false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setValidationCompound1And2(String content) {
+        String signedDate = "Signed Date: ";
+        String medication = "Medication(s) :";
+
+        int indexOfSignedDate = 0;
+        int indexOfMedication = 0;
+
+        String compound1 = "Compound1 ";
+        String compound2 = "Compound2 ";
+
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(medication)) {
+                indexOfMedication = i;
+            }
+
+            if (stringsFromReport.get(i).contains(signedDate)) {
+                indexOfSignedDate = i;
+            }
+        }
+
+        if (content.contains(signedDate) && content.contains(medication)) {
+            for (int i = 0; i < stringsFromReport.size(); i++) {
+                if (i < indexOfSignedDate && i > indexOfMedication) {
+                    if (stringsFromReport.get(i).contains(compound1)) {
+                        String tempStringFromReport = stringsFromReport.get(i).replace(compound1, "");
+
+                        List<String> data = Arrays.stream(tempStringFromReport.split(" "))
+                                .map(String::trim)
+                                .collect(Collectors.toList());
+                        super.setValidationCompound1Result(data.get(0));
+                        super.setValidationCompound1Concentration(data.get(1));
+                        super.setValidationCompound1Cutoff(data.get(2));
+                        super.setValidationCompound1Comments(data.get(3));
+                    }
+                    if (stringsFromReport.get(i).contains(compound2)) {
+                        String tempStringFromReport = stringsFromReport.get(i).replace(compound2, "");
+
+                        List<String> data = Arrays.stream(tempStringFromReport.split(" "))
+                                .map(String::trim)
+                                .collect(Collectors.toList());
+                        super.setValidationCompound2Result(data.get(0));
+                        super.setValidationCompound2Cutoff(data.get(1));
+                        super.setValidationCompound2Concentration(data.get(2));
+                        super.setValidationCompound2Comments(data.get(3));
+                    }
+                }
+            }
         }
     }
 
@@ -301,5 +387,19 @@ public class PDFOrder extends Order {
         return hits;
     }
 
+    public PDDocument getOrder() {
+        return order;
+    }
 
+    public void setOrder(PDDocument order) {
+        this.order = order;
+    }
+
+    public String getSignedDate() {
+        return signedDate;
+    }
+
+    public boolean isReportIsSigned() {
+        return reportIsSigned;
+    }
 }

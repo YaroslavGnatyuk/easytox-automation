@@ -87,4 +87,42 @@ Feature: Security framework test
     When Click Finalize and enter Sign Pin when it prompts for Sign Pin.
     Then Case should be finalized successfully.
 
+    When Click on PDF icon under 'Report' column of finalized case.
+    Then Report should be opened in the PDF format.
 
+    When Verify the details displayed in the report.
+    Then Lab Name along with lab address should be displayed on the top right of the screen.
+
+    When Verify the details of order displayed in the report.
+    Then Following details should be displayed in the report: Accession Number: Value should match the data entered on Case entry
+    And Patient Name: Value should match the data entered on Case entry
+    And Patient DOB: Value should match the data entered on Case entry
+    And Collected Date: Value should match the data entered on Case entry
+    And Physician: Value should match the data entered on Case entry
+    And Sample Type: Value should match the data entered on Case entry
+    And Received in Lab: Value should match the data entered on Case entry
+
+    When Verify the details displayed in "Consistent Results-Reported Medication Detected" section.
+    Then Following details should be displayed Compound1 Result - "POS"
+    And Conc. - <Value entered on Case Entry>
+    And Detetction Window Cutoff - <Valueentered on Case Entry>
+#    In bottom line in order to test case should be "Pos" instead of "Positive"
+    And Comments - "Positive"
+
+    When Verify the details displayed in "Inconsistent Results - Unexpected Positives" section for compound2.
+    Then Following details should be displayed:Compound2 Result - "POS"
+    And Compound2 Conc. - <Value entered on Case Entry>
+    And Compound2 Cutoff - <Value entered on Case Entry>
+    And Compound2 Comments - "Pos"
+#    In bottom line in order to test case should be "Specimen Validity Testing" instead of "SPECIMEN VALIDITY TESTING"
+    When Verify the details displayed in "SPECIMEN VALIDITY TESTING" section for VCompound.
+    Then Data entered in this section should be same as during Case Entry.
+
+    When Verify "Medication(s)"
+    Then "Drug1" should be displayed under 'Medications'.
+
+#    When Verify details from 'Test Screen Validation' section are displayed.
+    Then Details from 'Test Screen Validation' section in the case entry should be displayed.
+
+    When Verify Signature
+    Then Signature of Pathologist along with Signed Date should be displayed.

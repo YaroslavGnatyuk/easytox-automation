@@ -17,7 +17,7 @@ public class WebOrder extends Order {
 
     private static final Logger log = Logger.getLogger(WebOrder.class);
 
-    public WebOrder(WebDriver driver, String accessionNumber) {
+    public WebOrder(final WebDriver driver, String accessionNumber) {
         this.driver = driver;
         this.accessionNumber = accessionNumber;
     }

@@ -108,7 +108,6 @@ public abstract class Order {
 
     public void setCompound1Result(String compound1Result) {
         this.compound1Result = compound1Result;
-        this.validationCompound1Result = compound1Result;
     }
 
     public String getCompound1Concentration() {
@@ -117,7 +116,6 @@ public abstract class Order {
 
     public void setCompound1Concentration(String compound1Concentration) {
         this.compound1Concentration = compound1Concentration;
-        this.validationCompound1Concentration = compound1Concentration;
     }
 
     public String getCompound1Cutoff() {
@@ -126,7 +124,6 @@ public abstract class Order {
 
     public void setCompound1Cutoff(String compound1Cutoff) {
         this.compound1Cutoff = compound1Cutoff;
-        this.validationCompound1Cutoff = compound1Cutoff;
     }
 
     public String getCompound1Comments() {
@@ -135,7 +132,6 @@ public abstract class Order {
 
     public void setCompound1Comments(String compound1Comments) {
         this.compound1Comments = compound1Comments;
-        this.validationCompound1Comments = compound1Comments;
 
     }
 
@@ -145,7 +141,6 @@ public abstract class Order {
 
     public void setCompound2Result(String compound2Result) {
         this.compound2Result = compound2Result;
-        this.validationCompound2Result = compound2Result;
     }
 
     public String getCompound2Concentration() {
@@ -154,7 +149,6 @@ public abstract class Order {
 
     public void setCompound2Concentration(String compound2Concentration) {
         this.compound2Concentration = compound2Concentration;
-        this.validationCompound2Concentration = compound2Concentration;
     }
 
     public String getCompound2Cutoff() {
@@ -163,7 +157,6 @@ public abstract class Order {
 
     public void setCompound2Cutoff(String compound2Cutoff) {
         this.compound2Cutoff = compound2Cutoff;
-        this.validationCompound2Cutoff = compound2Cutoff;
     }
 
     public String getCompound2Comments() {
@@ -172,7 +165,6 @@ public abstract class Order {
 
     public void setCompound2Comments(String compound2Comments) {
         this.compound2Comments = compound2Comments;
-        this.validationCompound2Comments = compound2Comments;
     }
 
     public String getvCompound1Result() {
@@ -245,6 +237,70 @@ public abstract class Order {
 
     public void setMedications(List<String> medications) {
         this.medications = medications;
+    }
+
+    public String getValidationCompound1Result() {
+        return validationCompound1Result;
+    }
+
+    public void setValidationCompound1Result(String validationCompound1Result) {
+        this.validationCompound1Result = validationCompound1Result;
+    }
+
+    public String getValidationCompound1Cutoff() {
+        return validationCompound1Cutoff;
+    }
+
+    public void setValidationCompound1Cutoff(String validationCompound1Cutoff) {
+        this.validationCompound1Cutoff = validationCompound1Cutoff;
+    }
+
+    public String getValidationCompound1Concentration() {
+        return validationCompound1Concentration;
+    }
+
+    public void setValidationCompound1Concentration(String validationCompound1Concentration) {
+        this.validationCompound1Concentration = validationCompound1Concentration;
+    }
+
+    public String getValidationCompound1Comments() {
+        return validationCompound1Comments;
+    }
+
+    public void setValidationCompound1Comments(String validationCompound1Comments) {
+        this.validationCompound1Comments = validationCompound1Comments;
+    }
+
+    public String getValidationCompound2Result() {
+        return validationCompound2Result;
+    }
+
+    public void setValidationCompound2Result(String validationCompound2Result) {
+        this.validationCompound2Result = validationCompound2Result;
+    }
+
+    public String getValidationCompound2Cutoff() {
+        return validationCompound2Cutoff;
+    }
+
+    public void setValidationCompound2Cutoff(String validationCompound2Cutoff) {
+        this.validationCompound2Cutoff = validationCompound2Cutoff;
+    }
+
+    public String getValidationCompound2Concentration() {
+        return validationCompound2Concentration;
+    }
+
+    public void setValidationCompound2Concentration(String validationCompound2Concentration) {
+        this.validationCompound2Concentration = validationCompound2Concentration;
+    }
+
+    public String getValidationCompound2Comments() {
+        return validationCompound2Comments;
+    }
+
+    public void setValidationCompound2Comments(String validationCompound2Comments) {
+        this.validationCompound2Comments = validationCompound2Comments;
     }
 
     @Override

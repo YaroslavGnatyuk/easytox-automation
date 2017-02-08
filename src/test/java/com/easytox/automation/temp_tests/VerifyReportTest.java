@@ -4,6 +4,7 @@ import com.easytox.automation.steps.security.reports.PDFOrder;
 import com.easytox.automation.steps.security.reports.WebOrder;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -22,9 +23,11 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 public class VerifyReportTest {
-    /** linux path is /home/user/temp, windows is C:\easy_tox_temp\ **/
-    private static final String downloadFilepath = "/home/yroslav/temp";
-//    private static final String downloadFilepath = "C:\\easy_tox_temp\\";
+    /**
+     * linux path is /home/user/temp, windows is C:\easy_tox_temp\
+     **/
+//    private static final String downloadFilepath = "/home/yroslav/temp";
+    private static final String downloadFilepath = "C:\\easy_tox_temp\\";
 
     private static final String easytoxAddress = "http://bmtechsol.com:8080/easytox/";
 
@@ -36,9 +39,9 @@ public class VerifyReportTest {
     private WebOrder webOrder;
 
     public void init() {
-        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
-//        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
-
+//        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
+        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+        createTempDir(downloadFilepath);
         DesiredCapabilities capabilities = getChromePreferences();
 
         driver = new ChromeDriver(capabilities);
@@ -50,16 +53,14 @@ public class VerifyReportTest {
 
     @Test
     public void entryPoint() {
-
         try {
-
             init();
             driver.findElement(By.name("j_username")).sendKeys("PathOne");
             driver.findElement(By.name("j_password")).sendKeys("Test@123");
             driver.findElement(By.cssSelector("button.btn.btn-md.btn-primary")).click();
             Thread.sleep(1500);
 
-            String caseAccession = "AA17-135";
+            String caseAccession = "AA17-185";
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
             Thread.sleep(1000);
@@ -76,18 +77,38 @@ public class VerifyReportTest {
             Thread.sleep(1000);
             webOrder = new WebOrder(driver, caseAccession);
             webOrder = webOrder.getOrderFromWeb();
-            close();
 
             log.info(webOrder);
             log.info(pdfOrder);
-            log.info(pdfOrder.getContentFromReport());
+//            log.info(pdfOrder.getContentFromReport());
+
+            log.info(isPresentInConsistentResultCompound1(pdfOrder.getContentFromReport()));
 
             assertTrue(pdfOrder.isPositionOfLabNameAndLabAddressValid());
             assertTrue(verifyDit());
-
         } catch (InterruptedException e) {
             log.info(e);
         }
+    }
+
+    private boolean isPresentInConsistentResultCompound1(String content) {
+        String consistentResult = "Consistent Results-Reported Medication Detected";
+        String inconsistentResult = "Inconsistent Results - Unexpected Positives";
+
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+
+        if(stringsFromReport.contains(consistentResult) && stringsFromReport.contains(inconsistentResult)) {
+            for (int i = 0; i < stringsFromReport.size(); i++) {
+                if (i > stringsFromReport.indexOf(consistentResult) &&
+                        i < stringsFromReport.indexOf(inconsistentResult)) {
+                    if(stringsFromReport.get(i).contains("Compound1 ")){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private boolean verifyDit() {
@@ -130,7 +151,7 @@ public class VerifyReportTest {
 
     private PDDocument downloadReport() {
         try {
-            createTempDir(downloadFilepath);
+//            createTempDir(downloadFilepath);
 
             String reportPath = getPDFFile(downloadFilepath).getPath();
             return PDDocument.load(reportPath);
@@ -174,8 +195,9 @@ public class VerifyReportTest {
         return files.get(0);
     }
 
-    private void close() {
+    @After
+    public void close() {
         driver.close();
+        driver.quit();
     }
-
 }
