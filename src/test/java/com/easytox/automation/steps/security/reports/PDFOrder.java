@@ -62,7 +62,7 @@ public class PDFOrder extends Order {
         }
     }
 
-    private void isReportSigned(){
+    private void isReportSigned() {
         try {
             PDFTextStripper parser = new PDFTextStripper();
             parser.setSortByPosition(true);
@@ -70,9 +70,9 @@ public class PDFOrder extends Order {
             PDPage page = parser.getCurrentPage();
             PDResources resources = page.getResources();
             Map<String, PDXObject> images = resources.getXObjects();
-            if (!images.isEmpty()){
+            if (!images.isEmpty()) {
                 reportIsSigned = true;
-            }else{
+            } else {
                 reportIsSigned = false;
             }
         } catch (IOException e) {
@@ -110,10 +110,18 @@ public class PDFOrder extends Order {
                         List<String> data = Arrays.stream(tempStringFromReport.split(" "))
                                 .map(String::trim)
                                 .collect(Collectors.toList());
-                        super.setValidationCompound1Result(data.get(0));
-                        super.setValidationCompound1Concentration(data.get(1));
-                        super.setValidationCompound1Cutoff(data.get(2));
-                        super.setValidationCompound1Comments(data.get(3));
+                        if (data.size() < 4) {
+                            data = setDefaultValue();
+                            super.setValidationCompound1Result(data.get(0));
+                            super.setValidationCompound1Concentration(data.get(1));
+                            super.setValidationCompound1Cutoff(data.get(2));
+                            super.setValidationCompound1Comments(data.get(3));
+                        } else if (data.size() == 4) {
+                            super.setValidationCompound1Result(data.get(0));
+                            super.setValidationCompound1Concentration(data.get(1));
+                            super.setValidationCompound1Cutoff(data.get(2));
+                            super.setValidationCompound1Comments(data.get(3));
+                        }
                     }
                     if (stringsFromReport.get(i).contains(compound2)) {
                         String tempStringFromReport = stringsFromReport.get(i).replace(compound2, "");
@@ -121,10 +129,19 @@ public class PDFOrder extends Order {
                         List<String> data = Arrays.stream(tempStringFromReport.split(" "))
                                 .map(String::trim)
                                 .collect(Collectors.toList());
-                        super.setValidationCompound2Result(data.get(0));
-                        super.setValidationCompound2Cutoff(data.get(1));
-                        super.setValidationCompound2Concentration(data.get(2));
-                        super.setValidationCompound2Comments(data.get(3));
+
+                        if (data.size() < 4) {
+                            data = setDefaultValue();
+                            super.setValidationCompound2Result(data.get(0));
+                            super.setValidationCompound2Cutoff(data.get(1));
+                            super.setValidationCompound2Concentration(data.get(2));
+                            super.setValidationCompound2Comments(data.get(3));
+                        } else if (data.size() == 4) {
+                            super.setValidationCompound2Result(data.get(0));
+                            super.setValidationCompound2Cutoff(data.get(1));
+                            super.setValidationCompound2Concentration(data.get(2));
+                            super.setValidationCompound2Comments(data.get(3));
+                        }
                     }
                 }
             }
@@ -221,16 +238,22 @@ public class PDFOrder extends Order {
 
         if (stringFromReport.contains(compound1)) {
             String tempStringFromReport = stringFromReport.replace(compound1, "");
-
             List<String> data = Arrays.asList(tempStringFromReport.split(" "));
+            if (data.size() < 4) {
+                data = setDefaultValue();
+                super.setCompound1Result(data.get(0));
+                super.setCompound1Cutoff(data.get(1));
+                super.setCompound1Concentration(data.get(2));
+                super.setCompound1Comments(data.get(3));
+            } else if (data.size() == 4) {
+                super.setCompound1Result(data.get(0));
+                super.setCompound1Cutoff(data.get(1));
+                super.setCompound1Concentration(data.get(2));
+                super.setCompound1Comments(data.get(3));
+            }
             for (int i = 0; i < data.size(); i++) {
                 data.set(i, data.get(i).trim());
             }
-
-            super.setCompound1Result(data.get(0));
-            super.setCompound1Cutoff(data.get(1));
-            super.setCompound1Concentration(data.get(2));
-            super.setCompound1Comments(data.get(3));
         }
     }
 
@@ -241,15 +264,25 @@ public class PDFOrder extends Order {
             String tempStringFromReport = stringFromReport.replace(compound1, "");
 
             List<String> data = Arrays.asList(tempStringFromReport.split(" "));
+
+            if (data.size() < 4) {
+                data = setDefaultValue();
+                super.setCompound2Result(data.get(0));
+                super.setCompound2Cutoff(data.get(1));
+                super.setCompound2Concentration(data.get(2));
+                super.setCompound2Comments(data.get(3));
+            } else if (data.size() == 4) {
+                super.setCompound2Result(data.get(0));
+                super.setCompound2Cutoff(data.get(1));
+                super.setCompound2Concentration(data.get(2));
+                super.setCompound2Comments(data.get(3));
+            }
+
             for (int i = 0; i < data.size(); i++) {
                 data.set(i, data.get(i).trim());
             }
-
-            super.setCompound2Result(data.get(0));
-            super.setCompound2Cutoff(data.get(1));
-            super.setCompound2Concentration(data.get(2));
-            super.setCompound2Comments(data.get(3));
         }
+
     }
 
     private void setPatientNameAndPhysician(final String stringFromReport) {
@@ -385,6 +418,16 @@ public class PDFOrder extends Order {
         stripper.setEndPage(page);
         stripper.getText(document);
         return hits;
+    }
+
+    private List<String> setDefaultValue() {
+        List<String> data = new ArrayList<>();
+        data.add("default");
+        data.add("default");
+        data.add("default");
+        data.add("default");
+
+        return data;
     }
 
     public PDDocument getOrder() {

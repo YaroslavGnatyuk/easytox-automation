@@ -63,7 +63,7 @@ Feature: Security framework test
     When Under Test Screen section, select concentration for 'Compound1' such that test results are "Positive Result".
     Then Selections should be made as appropriately for 'Compound1'.
 
-    When Under Test Screen section, select concentration for 'Compound2' such that test results are "Positive Result".
+    When Under Test Screen section, select concentration for 'Compound2' such that test results are "Negative Result".
     Then Selections should be made as appropriately for 'Compound2'.
 
     When Under Validity Testing section, select concentration for 'VCompound1' in such a way that test results are "Normal Result".
@@ -86,3 +86,49 @@ Feature: Security framework test
 
     When Click Finalize and enter Sign Pin when it prompts for Sign Pin.
     Then Case should be finalized successfully.
+
+    #Verify report
+
+    When Click on PDF icon under 'Report' column of finalized case.
+    Then Report should be opened in the PDF format.
+
+    When Verify the details displayed in the report.
+    Then Lab Name along with lab address should be displayed on the top right of the screen.
+
+    When Verify the details of order displayed in the report.
+    Then Following details should be displayed in the report: Accession Number: Value should match the data entered on Case entry
+    And Patient Name: Value should match the data entered on Case entry
+    And Patient DOB: Value should match the data entered on Case entry
+    And Collected Date: Value should match the data entered on Case entry
+    And Physician: Value should match the data entered on Case entry
+    And Sample Type: Value should match the data entered on Case entry
+    And Received in Lab: Value should match the data entered on Case entry
+
+    When Verify the details displayed in "Consistent Results-Reported Medication Detected" section.
+    Then No values should be displayed in this section.
+
+    When Verify the details displayed in "Inconsistent Results - Unexpected Negatives for Medications" section of Compound2.
+    Then Following details should be displayed: Compound2 Result - "NEG"
+    And Conc. - <Value entered on Case Entry>
+    And Cutoff - <Value entered on Case Entry>
+    And Comments - "Neg"
+
+    When Verify the details displayed in "Inconsistent Results - Unexpected Positives" section of Compound1.
+    Then Following details should be Compound1: Result - "POS"
+    And Compound1 Conc. - <Value entered on Case Entry>
+    And Compound1 Cutoff - <Value entered on Case Entry>
+    #    In bottom line in order to test case should be "Pos" instead of "Positive"
+    And Compound1 Comments - "Positive"
+
+    #    In bottom line in order to test case should be "Specimen Validity Testing" instead of "SPECIMEN VALIDITY TESTING"
+    When Verify the details displayed in "SPECIMEN VALIDITY TESTING" section Specimen Validity Testing.
+    Then Data entered in this section should be same as the data entered in 'Specimen Validity Testing' section during Case Entry.
+
+    When Verify "Medications"
+    Then "Drug2" should be displayed under 'Medications'.
+
+    When Verify details from "Test Screen Validation" section Test Screen Validation are displayed .
+    Then Details from 'Test Screen Validation' section in the case entry should be displayed.
+
+    When Verify Signature
+    Then Signature of Pathologist along with Signed Date should be displayed.

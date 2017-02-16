@@ -55,12 +55,12 @@ public class VerifyReportTest {
     public void entryPoint() {
         try {
             init();
-            driver.findElement(By.name("j_username")).sendKeys("PathOne");
+            driver.findElement(By.name("j_username")).sendKeys("PathTwo");
             driver.findElement(By.name("j_password")).sendKeys("Test@123");
             driver.findElement(By.cssSelector("button.btn.btn-md.btn-primary")).click();
             Thread.sleep(1500);
 
-            String caseAccession = "AA17-185";
+            String caseAccession = "AA17-137";
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
             Thread.sleep(1000);
@@ -80,12 +80,9 @@ public class VerifyReportTest {
 
             log.info(webOrder);
             log.info(pdfOrder);
-//            log.info(pdfOrder.getContentFromReport());
+            log.info(pdfOrder.getContentFromReport());
 
-            log.info(isPresentInConsistentResultCompound1(pdfOrder.getContentFromReport()));
-
-            assertTrue(pdfOrder.isPositionOfLabNameAndLabAddressValid());
-            assertTrue(verifyDit());
+//            log.info(isPresentInConsistentResultCompound1(pdfOrder.getContentFromReport()));
         } catch (InterruptedException e) {
             log.info(e);
         }
