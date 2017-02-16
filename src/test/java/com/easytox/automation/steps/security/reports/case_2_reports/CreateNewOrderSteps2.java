@@ -1,14 +1,13 @@
 package com.easytox.automation.steps.security.reports.case_2_reports;
 
 import com.easytox.automation.steps.security.reports.PDFOrder;
-import com.easytox.automation.steps.security.reports.PDFSectionNotFoundException;
+import com.easytox.automation.steps.security.reports.exception.PDFSectionNotFoundException;
 import com.easytox.automation.steps.security.reports.WebOrder;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import cucumber.api.java.en_scouse.An;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.openqa.selenium.By;
