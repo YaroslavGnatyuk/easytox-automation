@@ -86,3 +86,28 @@ Feature: Security framework test
 
     When Click Finalize and enter Sign Pin when it prompts for Sign Pin.
     Then Case should be finalized successfully.
+
+    #    Verify report
+    When Click on PDF icon under 'Report' column of finalized case.
+    Then Report should be opened in the PDF format.
+
+    When Verify the details displayed in the report.
+    Then Lab Name along with lab address should be displayed on the top right of the screen.
+
+    When Verify the details of order displayed in the report.
+    Then Following details should be displayed in the report: Accession Number: Value should match the data entered on Case entry
+    And Patient Name: Value should match the data entered on Case entry
+    And Patient DOB: Value should match the data entered on Case entry
+    And Collected Date: Value should match the data entered on Case entry
+    And Physician: Value should match the data entered on Case entry
+    And Sample Type: Value should match the data entered on Case entry
+    And Received in Lab: Value should match the data entered on Case entry
+
+    When Verify the details displayed in 'Consistent Results-Reported Medication Detected' "Consistent Results-Reported Medication Detected" section.
+    Then No values should be displayed in 'Consistent Results-Reported Medication Detected' section
+
+    When Verify the details displayed in 'Inconsistent Results - Unexpected Negatives for Medications' "Inconsistent Results - Unexpected Negatives for Medications" section.
+    Then No values should be displayed in 'Inconsistent Results - Unexpected Negatives for Medications' section
+#
+#    When Verify the details displayed in 'Inconsistent Results - Unexpected Positives' "Inconsistent Results - Unexpected Positives" section.
+#    Then No values should be displayed in 'Inconsistent Results - Unexpected Positives' section

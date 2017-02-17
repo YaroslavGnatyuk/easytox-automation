@@ -60,7 +60,7 @@ public class VerifyReportTest {
             driver.findElement(By.cssSelector("button.btn.btn-md.btn-primary")).click();
             Thread.sleep(1500);
 
-            String caseAccession = "AA17-138";
+            String caseAccession = "AA17-139";
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
             Thread.sleep(1000);
@@ -78,10 +78,10 @@ public class VerifyReportTest {
             webOrder = new WebOrder(driver, caseAccession);
             webOrder = webOrder.getOrderFromWeb();
 
-            log.info("PDF " + pdfOrder);
-            log.info("Web " + webOrder);
-            pdfOrder.getMedications().forEach(System.out::println);
-//            log.info(pdfOrder.getContentFromReport());
+//            log.info("PDF " + pdfOrder);
+//            log.info("Web " + webOrder);
+//            pdfOrder.getMedications().forEach(System.out::println);
+            log.info(pdfOrder.getContentFromReport());
         } catch (InterruptedException e) {
             log.info(e);
         }

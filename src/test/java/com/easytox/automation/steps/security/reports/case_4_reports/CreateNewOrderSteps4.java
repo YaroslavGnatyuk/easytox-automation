@@ -1,21 +1,32 @@
 package com.easytox.automation.steps.security.reports.case_4_reports;
 
 import com.easytox.automation.driver.DriverBase;
+import com.easytox.automation.steps.security.reports.PDFOrder;
+import com.easytox.automation.steps.security.reports.WebOrder;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,26 +34,35 @@ import java.util.stream.Collectors;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class CreateNewOrderSteps4 {
     private WebDriver driver;
     private WebDriverWait wait;
     private Logger log = Logger.getLogger(CreateNewOrderSteps4.class);
+
     private static final String LOGIN_URL = "http://bmtechsol.com:8080/easytox/";
     private static final String ERROR_IN_LOGIN_URL = "http://bmtechsol.com:8080/easytox/?login_error=1&format=";
     private static final String CREATE_NEW_ORDER_URL = "http://bmtechsol.com:8080/easytox/orderFrom/create";
+
+    //    private static final String downloadFilepath = "/home/yroslav/temp";
+    private static final String downloadFilepath = "C:\\easy_tox_temp\\";
 
     private int totalRecordsInOrderListBeforeCreationNewOrder = 0;
     private String caseAccession = null;
     private String newOrder = null;
 
+    private PDFOrder pdfOrder;
+    private WebOrder webOrder;
+
     @Before
     public void init() {
-        DriverBase.instantiateDriverObject();
-        driver = DriverBase.getDriver();
+        //        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
+        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+        DesiredCapabilities capabilities = getChromePreferences();
+        driver = new ChromeDriver(capabilities);
         driver.manage().window().maximize();
-
-        wait = new WebDriverWait(driver, 15);
+        wait = new WebDriverWait(driver, 35);
     }
 
     @When("^Login to Easytox with \"([^\"]*)\" and \"([^\"]*)\" credentials.$")
@@ -555,7 +575,7 @@ public class CreateNewOrderSteps4 {
 
     @When("^Select 'Tasks' from the top menu.$")
     public void selectTasks() {
-        driver.findElement(By.cssSelector(WElement.TASKS)).click();
+        driver.findElement(By.xpath(WElement.TASKS)).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("See All Cases"))).click();
     }
 
@@ -646,8 +666,193 @@ public class CreateNewOrderSteps4 {
      * Verify Report
      **/
 
+    @When("^Click on PDF icon under 'Report' column of finalized case.$")
+    public void clickOnPDFIcon() {
+        try {
+            createTempDir(downloadFilepath);
+            driver.findElement(By.id("editlink")).click();
+            webOrder = new WebOrder(driver, caseAccession);
+            webOrder = webOrder.getOrderFromWeb();
+            driver.findElement(By.cssSelector(WElement.CASE_LIST_BUTTON)).click();
+            Thread.sleep(1000);
+
+            driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
+            Thread.sleep(300);
+            driver.findElement(By.cssSelector(WElement.REPORT_DOWNLOAD_ICON)).click();
+            Thread.sleep(1000);
+            PDDocument order = readPDFWithOrder();
+            pdfOrder = new PDFOrder(order);
+            pdfOrder = pdfOrder.fillAllFields();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Then("^Report should be opened in the PDF format.$")
+    public void checkFormatTheReport() {
+        assertTrue(pdfOrder.getOrder() != null);
+    }
+
+    @When("^Verify the details displayed in the report.$")
+    public void verifyLabNameAndLabAddressInTheReport() {
+        String labName = "Sujana LabOne";
+        String labAddressLine1 = "1234 Tuttles park drive Dublin";
+        String labAddressLine2 = "Ohio USA 43016";
+        String labAddressLine3 = "Lab Director:     CLIA ID:";
+
+        String allTextFromReport = pdfOrder.getContentFromReport();
+        assertTrue(allTextFromReport.contains(labName) &&
+                allTextFromReport.contains(labAddressLine1) &&
+                allTextFromReport.contains(labAddressLine2) &&
+                allTextFromReport.contains(labAddressLine3));
+    }
+
+    @Then("^Lab Name along with lab address should be displayed on the top right of the screen.$")
+    public void checkPositionOfLabNameAndLabAddress() {
+        assertTrue(pdfOrder.isPositionOfLabNameAndLabAddressValid());
+    }
+
+    @When("^Verify the details of order displayed in the report.$")
+    public void checkDetails() {
+        assertTrue(pdfOrder.getAccessionNumber() != null &&
+                pdfOrder.getPatientName() != null &&
+                pdfOrder.getPatientDOB() != null &&
+                pdfOrder.getCollectDate() != null &&
+                pdfOrder.getPhysician() != null &&
+                pdfOrder.getSampleType() != null &&
+                pdfOrder.getReceivedInLab() != null);
+    }
+
+    @Then("^Following details should be displayed in the report: Accession Number: Value should match the data entered on Case entry$")
+    public void checkAccessionNumber() {
+        assertTrue(pdfOrder.getAccessionNumber().equals(webOrder.getAccessionNumber()));
+    }
+
+    @And("^Patient Name: Value should match the data entered on Case entry$")
+    public void checkPatientName() {
+        assertTrue(pdfOrder.getPatientName().equals(webOrder.getPatientName()));
+    }
+
+    @And("^Patient DOB: Value should match the data entered on Case entry$")
+    public void checkPatientDOB() {
+        assertTrue(pdfOrder.getPatientDOB().equals(webOrder.getPatientDOB()));
+    }
+
+    @And("^Collected Date: Value should match the data entered on Case entry$")
+    public void checkCollectedDate() {
+        assertTrue(pdfOrder.getCollectDate().equals(webOrder.getCollectDate()));
+    }
+
+    @And("^Physician: Value should match the data entered on Case entry$")
+    public void checkPhysician() {
+        assertTrue(pdfOrder.getPhysician().equals(webOrder.getPhysician()));
+    }
+
+    @And("^Sample Type: Value should match the data entered on Case entry$")
+    public void checkSampleType() {
+        assertTrue(pdfOrder.getSampleType().equals(webOrder.getSampleType()));
+    }
+
+    @And("^Received in Lab: Value should match the data entered on Case entry$")
+    public void checkReceivedInLab() {
+        assertTrue(pdfOrder.getReceivedInLab().equals(webOrder.getReceivedInLab()));
+    }
+
+    @When("^Verify the details displayed in 'Consistent Results-Reported Medication Detected' \"([^\"]*)\" section.$")
+    public void isConsistentResultsReportedMedicationDetectedSectionShowed(String section){
+        assertTrue(pdfOrder.getContentFromReport().contains(section));
+    }
+
+    @Then("^No values should be displayed in 'Consistent Results-Reported Medication Detected' section$")
+    public void checkDetailsInConsistentResultsReportedMedicationDetectedSection(){
+        String consistentResult = "Consistent Results-Reported Medication Detected";
+        String inconsistentResult = "Inconsistent Results - Unexpected Negatives for Medications";
+        String content = pdfOrder.getContentFromReport();
+        List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+
+        int indexOfConsistentResult = stringsFromReport.indexOf(consistentResult);
+        int indexOfInconsistentResult = stringsFromReport.indexOf(inconsistentResult);
+        int substringNotFound = -1;
+
+        if(indexOfConsistentResult != substringNotFound && indexOfInconsistentResult != substringNotFound){
+            for (int i = indexOfConsistentResult; i < indexOfInconsistentResult; i++) {
+                if (stringsFromReport.get(i).contains("Compound1 ") && stringsFromReport.get(i).contains("Compound2 ")){
+                    fail();
+                }
+            }
+        }
+    }
+
     @After
     public void close(){
         driver.close();
+    }
+
+    private DesiredCapabilities getChromePreferences() {
+        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        chromePrefs.put("profile.default_content_settings.popups", 0);
+        chromePrefs.put("download.default_directory", downloadFilepath);
+
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("prefs", chromePrefs);
+        options.addArguments("test-type");
+
+        DesiredCapabilities cap = DesiredCapabilities.chrome();
+        cap.setCapability("chrome.binary", "./drivers/chromedriver.exe");
+        cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+        cap.setCapability(ChromeOptions.CAPABILITY, options);
+
+        return cap;
+    }
+
+    private PDDocument readPDFWithOrder() {
+        PDDocument report = downloadReport();
+        deleteTempDirAndInnerFiles(downloadFilepath);
+
+        return report;
+    }
+
+    private PDDocument downloadReport() {
+        try {
+            String reportPath = getPDFFile(downloadFilepath).getPath();
+            return PDDocument.load(reportPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void createTempDir(String path) {
+        File dir = new File(path);
+        if (!dir.exists()) {
+            if (dir.mkdir()) {
+                log.info("Directory have created");
+            } else {
+                log.info("Directory have not created");
+            }
+        }
+    }
+
+    private void deleteTempDirAndInnerFiles(String path) {
+        File dir = new File(path);
+        if (dir.exists()) {
+
+            File[] allFiles = dir.listFiles();
+            if (allFiles != null && allFiles.length != 0) {
+                Arrays.stream(allFiles).forEach(File::delete);
+            }
+
+            if (dir.delete()) {
+                System.out.println("Directory have deleted");
+            } else {
+                System.out.println("Directory have not deleted");
+            }
+        }
+    }
+
+    private File getPDFFile(String path) {
+        File dir = new File(path);
+        List<File> files = Arrays.asList(dir.listFiles());
+        return files.get(0);
     }
 }

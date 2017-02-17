@@ -41,17 +41,17 @@ interface WElement {
     String ONE_COLUMN_IN_ROW = "#caseorder > tbody > tr > td";
 
     String RESULT_TEST_COMMENTS_FOR_COMPOUND_1 = "#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(7) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
-    String RESULT_TEST_COMMENTS_FOR_COMPOUND_2 ="#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(12) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
-    String RESULT_TEST_COMMENTS_FOR_VCOMPOUND_1 ="#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
-    String RESULT_TEST_COMMENTS_FOR_VCOMPOUND_2 ="#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
+    String RESULT_TEST_COMMENTS_FOR_COMPOUND_2 = "#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(12) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
+    String RESULT_TEST_COMMENTS_FOR_VCOMPOUND_1 = "#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
+    String RESULT_TEST_COMMENTS_FOR_VCOMPOUND_2 = "#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
     String UPDATE_ORDER = "submitbtn";
     String CASE_ACCESSION_ON_UPDATE_CASE_PAGE = "#form > div > div > div.well.bg-blue > div > div:nth-child(2) > div:nth-child(1)";
-    String TASKS = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li:nth-child(6) > a > i";
+    String TASKS = "/html/body/div[2]/div/div/div[3]/div/ul/li[8]/a/i";
 
     String COMPOUND_1_CONCENTRATION = "#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(7) > div > div:nth-child(4) > div > input";
-    String COMPOUND_2_CONCENTRATION ="#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(12) > div > div:nth-child(4) > div > input";
-    String VCOMPOUND_1_CONCENTRATION ="#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(4) > div > input";
-    String VCOMPOUND_2_CONCENTRATION ="#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(4) > div > input";
+    String COMPOUND_2_CONCENTRATION = "#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(12) > div > div:nth-child(4) > div > input";
+    String VCOMPOUND_1_CONCENTRATION = "#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(4) > div > input";
+    String VCOMPOUND_2_CONCENTRATION = "#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(4) > div > input";
     String CASE_NUMBER = "editlink";
     String FINALIZED_RADIO_OPTION = "//*[@id=\"form\"]/div/div/div[1]/div/div[4]/div/div/div[3]/label/span";
     String CONFIRMATION_MESSAGE = "#confirmFinalize > div > div > div.modal-body";
@@ -60,4 +60,7 @@ interface WElement {
     String APPLY_SIGNATURE_BUTTON = "#validate_pin";
 
     String CLOSE_POPUP_WINDOW = "#com_asprise_scan_app_ok > a";
+    String REPORT_DOWNLOAD_ICON = "#caseorder > tbody > tr > td:nth-child(9) > form > a > i";
+
+    String CASE_LIST_BUTTON = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li:nth-child(1) > a";
 }
