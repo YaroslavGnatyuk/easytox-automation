@@ -111,11 +111,10 @@ public class PDFOrder extends Order {
                                 .map(String::trim)
                                 .collect(Collectors.toList());
                         if (data.size() < 4) {
-                            data = setDefaultValue();
-                            super.setValidationCompound1Result(data.get(0));
-                            super.setValidationCompound1Concentration(data.get(1));
-                            super.setValidationCompound1Cutoff(data.get(2));
-                            super.setValidationCompound1Comments(data.get(3));
+                            super.setValidationCompound1Result("default");
+                            super.setValidationCompound1Concentration("default");
+                            super.setValidationCompound1Cutoff("default");
+                            super.setValidationCompound1Comments("default");
                         } else if (data.size() == 4) {
                             super.setValidationCompound1Result(data.get(0));
                             super.setValidationCompound1Concentration(data.get(1));
@@ -129,13 +128,11 @@ public class PDFOrder extends Order {
                         List<String> data = Arrays.stream(tempStringFromReport.split(" "))
                                 .map(String::trim)
                                 .collect(Collectors.toList());
-
                         if (data.size() < 4) {
-                            data = setDefaultValue();
-                            super.setValidationCompound2Result(data.get(0));
-                            super.setValidationCompound2Cutoff(data.get(1));
-                            super.setValidationCompound2Concentration(data.get(2));
-                            super.setValidationCompound2Comments(data.get(3));
+                            super.setValidationCompound2Result("default");
+                            super.setValidationCompound2Cutoff("default");
+                            super.setValidationCompound2Concentration("default");
+                            super.setValidationCompound2Comments("default");
                         } else if (data.size() == 4) {
                             super.setValidationCompound2Result(data.get(0));
                             super.setValidationCompound2Cutoff(data.get(1));
@@ -239,50 +236,43 @@ public class PDFOrder extends Order {
         if (stringFromReport.contains(compound1)) {
             String tempStringFromReport = stringFromReport.replace(compound1, "");
             List<String> data = Arrays.asList(tempStringFromReport.split(" "));
+            for (int i = 0; i < data.size(); i++) {
+                data.set(i, data.get(i).trim());
+            }
             if (data.size() < 4) {
-                data = setDefaultValue();
-                super.setCompound1Result(data.get(0));
-                super.setCompound1Cutoff(data.get(1));
-                super.setCompound1Concentration(data.get(2));
-                super.setCompound1Comments(data.get(3));
+                super.setCompound1Result("default");
+                super.setCompound1Cutoff("default");
+                super.setCompound1Concentration("default");
+                super.setCompound1Comments("default");
             } else if (data.size() == 4) {
                 super.setCompound1Result(data.get(0));
                 super.setCompound1Cutoff(data.get(1));
                 super.setCompound1Concentration(data.get(2));
                 super.setCompound1Comments(data.get(3));
-            }
-            for (int i = 0; i < data.size(); i++) {
-                data.set(i, data.get(i).trim());
             }
         }
     }
 
     public void setCompound2(final String stringFromReport) {
-        String compound1 = "Compound2 ";
-
-        if (stringFromReport.contains(compound1)) {
-            String tempStringFromReport = stringFromReport.replace(compound1, "");
-
+        String compound2 = "Compound2 ";
+        if (stringFromReport.contains(compound2)) {
+            String tempStringFromReport = stringFromReport.replace(compound2, "");
             List<String> data = Arrays.asList(tempStringFromReport.split(" "));
-
             if (data.size() < 4) {
-                data = setDefaultValue();
-                super.setCompound2Result(data.get(0));
-                super.setCompound2Cutoff(data.get(1));
-                super.setCompound2Concentration(data.get(2));
-                super.setCompound2Comments(data.get(3));
+                super.setCompound2Result("default");
+                super.setCompound2Cutoff("default");
+                super.setCompound2Concentration("default");
+                super.setCompound2Comments("default");
             } else if (data.size() == 4) {
                 super.setCompound2Result(data.get(0));
                 super.setCompound2Cutoff(data.get(1));
                 super.setCompound2Concentration(data.get(2));
                 super.setCompound2Comments(data.get(3));
             }
-
             for (int i = 0; i < data.size(); i++) {
                 data.set(i, data.get(i).trim());
             }
         }
-
     }
 
     private void setPatientNameAndPhysician(final String stringFromReport) {
@@ -418,16 +408,6 @@ public class PDFOrder extends Order {
         stripper.setEndPage(page);
         stripper.getText(document);
         return hits;
-    }
-
-    private List<String> setDefaultValue() {
-        List<String> data = new ArrayList<>();
-        data.add("default");
-        data.add("default");
-        data.add("default");
-        data.add("default");
-
-        return data;
     }
 
     public PDDocument getOrder() {

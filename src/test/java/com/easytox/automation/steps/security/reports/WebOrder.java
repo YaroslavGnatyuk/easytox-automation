@@ -56,7 +56,6 @@ public class WebOrder extends Order {
         String compound1Comments = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(7) > div > div:nth-child(5) > div > div.col-sm-9 > div > input"))
                 .getAttribute("value");
-
         String compound2Result = new Select(driver.findElement(By.cssSelector("#compounds\\5b 1\\5d \\2e result")))
                 .getFirstSelectedOption()
                 .getText();
@@ -69,28 +68,24 @@ public class WebOrder extends Order {
         String compound2Comments = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(12) > div > div:nth-child(5) > div > div.col-sm-9 > div > input"))
                 .getAttribute("value");
-
         String vCompound1Result = new Select(driver.findElement(By.cssSelector("#validitycompounds\\5b 0\\5d \\2e result")))
                 .getFirstSelectedOption()
                 .getText();
         String vCompound1ReferenceRange = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(3) > div > input"))
                 .getAttribute("value");
-        ;
         String vCompound1Concentration = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(4) > div > input"))
                 .getAttribute("value");
         String vCompound1Comments = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(4) > div > div:nth-child(5) > div > div.col-sm-9 > div > input"))
                 .getAttribute("value");
-
         String vCompound2Result = new Select(driver.findElement(By.cssSelector("#validitycompounds\\5b 1\\5d \\2e result")))
                 .getFirstSelectedOption()
                 .getText();
         String vCompound2ReferenceRange = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(3) > div > input"))
                 .getAttribute("value");
-        ;
         String vCompound2Concentration = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(4) > div > input"))
                 .getAttribute("value");

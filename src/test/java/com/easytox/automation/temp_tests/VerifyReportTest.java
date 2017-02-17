@@ -60,7 +60,7 @@ public class VerifyReportTest {
             driver.findElement(By.cssSelector("button.btn.btn-md.btn-primary")).click();
             Thread.sleep(1500);
 
-            String caseAccession = "AA17-137";
+            String caseAccession = "AA17-138";
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
             Thread.sleep(1000);
@@ -78,11 +78,10 @@ public class VerifyReportTest {
             webOrder = new WebOrder(driver, caseAccession);
             webOrder = webOrder.getOrderFromWeb();
 
-            log.info(webOrder);
-            log.info(pdfOrder);
-            log.info(pdfOrder.getContentFromReport());
-
-//            log.info(isPresentInConsistentResultCompound1(pdfOrder.getContentFromReport()));
+            log.info("PDF " + pdfOrder);
+            log.info("Web " + webOrder);
+            pdfOrder.getMedications().forEach(System.out::println);
+//            log.info(pdfOrder.getContentFromReport());
         } catch (InterruptedException e) {
             log.info(e);
         }
@@ -94,11 +93,11 @@ public class VerifyReportTest {
 
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
-        if(stringsFromReport.contains(consistentResult) && stringsFromReport.contains(inconsistentResult)) {
+        if (stringsFromReport.contains(consistentResult) && stringsFromReport.contains(inconsistentResult)) {
             for (int i = 0; i < stringsFromReport.size(); i++) {
                 if (i > stringsFromReport.indexOf(consistentResult) &&
                         i < stringsFromReport.indexOf(inconsistentResult)) {
-                    if(stringsFromReport.get(i).contains("Compound1 ")){
+                    if (stringsFromReport.get(i).contains("Compound1 ")) {
                         return true;
                     }
                 }
