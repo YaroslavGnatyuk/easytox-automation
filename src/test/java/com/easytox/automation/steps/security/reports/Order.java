@@ -1,5 +1,6 @@
 package com.easytox.automation.steps.security.reports;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Order {
@@ -44,6 +45,7 @@ public abstract class Order {
     private String validationCompound2Comments;
 
     public Order() {
+        medications = new ArrayList<>();
     }
 
     public String getAccessionNumber() {
@@ -131,6 +133,8 @@ public abstract class Order {
     }
 
     public void setCompound1Comments(String compound1Comments) {
+        if (compound1Comments.contains(" Result"))
+            compound1Comments = compound1Comments.replace(" Result", "");
         this.compound1Comments = compound1Comments;
 
     }
@@ -164,6 +168,8 @@ public abstract class Order {
     }
 
     public void setCompound2Comments(String compound2Comments) {
+        if (compound2Comments.contains(" Result"))
+            compound2Comments = compound2Comments.replace(" Result", "");
         this.compound2Comments = compound2Comments;
     }
 

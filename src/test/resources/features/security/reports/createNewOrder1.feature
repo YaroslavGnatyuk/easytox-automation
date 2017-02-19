@@ -118,10 +118,10 @@ Feature: Security framework test
     When Verify the details displayed in "SPECIMEN VALIDITY TESTING" section for VCompound.
     Then Data entered in this section should be same as during Case Entry.
 
-    When Verify "Medication(s)"
+    When Verify "Medication(s) :"
     Then "Drug1" should be displayed under 'Medications'.
 
-#    When Verify details from 'Test Screen Validation' section are displayed.
+    When Verify details from 'Test Screen Validation' "Test Screen Validation" section are displayed.
     Then Details from 'Test Screen Validation' section in the case entry should be displayed.
 
     When Verify Signature

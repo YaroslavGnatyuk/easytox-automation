@@ -112,13 +112,13 @@ public class PDFOrder extends Order {
                                 .collect(Collectors.toList());
                         if (data.size() < 4) {
                             super.setValidationCompound1Result("default");
-                            super.setValidationCompound1Concentration("default");
                             super.setValidationCompound1Cutoff("default");
+                            super.setValidationCompound1Concentration("default");
                             super.setValidationCompound1Comments("default");
                         } else if (data.size() == 4) {
                             super.setValidationCompound1Result(data.get(0));
-                            super.setValidationCompound1Concentration(data.get(1));
-                            super.setValidationCompound1Cutoff(data.get(2));
+                            super.setValidationCompound1Cutoff(data.get(1));
+                            super.setValidationCompound1Concentration(data.get(2));
                             super.setValidationCompound1Comments(data.get(3));
                         }
                     }
@@ -149,10 +149,13 @@ public class PDFOrder extends Order {
         String medication = "Medication(s) :";
 
         if (stringFromReport.contains(medication)) {
-            String tempStringFromReport = stringFromReport.replace(medication, "");
+            String stringWithMedicationFromReport = stringFromReport.replace(medication, "");
+            if(stringWithMedicationFromReport.isEmpty()){
+                return;
+            }
 
             List<String> data = new ArrayList<>();
-            Collections.addAll(data, Arrays.stream(tempStringFromReport.split(",")).toArray(String[]::new));
+            Collections.addAll(data, Arrays.stream(stringWithMedicationFromReport.split(",")).toArray(String[]::new));
 
             for (int i = 0; i < data.size(); i++) {
                 data.set(i, data.get(i).trim());

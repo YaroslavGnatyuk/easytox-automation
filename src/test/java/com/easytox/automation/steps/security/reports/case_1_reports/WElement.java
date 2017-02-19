@@ -46,7 +46,7 @@ interface WElement {
     String RESULT_TEST_COMMENTS_FOR_VCOMPOUND_2 ="#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(5) > div > div.col-sm-9 > div > input";
     String UPDATE_ORDER = "submitbtn";
     String CASE_ACCESSION_ON_UPDATE_CASE_PAGE = "#form > div > div > div.well.bg-blue > div > div:nth-child(2) > div:nth-child(1)";
-    String TASKS = "/html/body/div[2]/div/div/div[3]/div/ul/li[7]/a";
+    String TASKS = "/html/body/div[2]/div/div/div[3]/div/ul/li[8]/a/i";
 
     String COMPOUND_1_CONCENTRATION = "#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(7) > div > div:nth-child(4) > div > input";
     String COMPOUND_2_CONCENTRATION ="#compounds > div > div > div.panel.panel-success > div.panel-body > div:nth-child(12) > div > div:nth-child(4) > div > input";

@@ -122,7 +122,7 @@ Feature: Security framework test
     When Verify the details displayed in 'Specimen Validity Testing' "SPECIMEN VALIDITY TESTING" section.
     Then Data entered in this section should be same as the data entered in 'Specimen Validity Testing' section during Case Entry.
 
-    When Verify "Medications"
+    When Verify "Medication(s) :"
     Then "Drug1","Drug2" should be displayed under 'Medications'.
 
     When Verify details from "Test Screen Validation" section Test Screen Validation are displayed .

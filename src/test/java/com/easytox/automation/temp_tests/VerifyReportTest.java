@@ -2,6 +2,7 @@ package com.easytox.automation.temp_tests;
 
 import com.easytox.automation.steps.security.reports.PDFOrder;
 import com.easytox.automation.steps.security.reports.WebOrder;
+import com.easytox.automation.steps.security.reports.exception.PDFFieldIsEmptyException;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.After;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+
 
 public class VerifyReportTest {
     /**
@@ -60,7 +62,7 @@ public class VerifyReportTest {
             driver.findElement(By.cssSelector("button.btn.btn-md.btn-primary")).click();
             Thread.sleep(1500);
 
-            String caseAccession = "AA17-139";
+            String caseAccession = "AA17-141";
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
             Thread.sleep(1000);
@@ -78,10 +80,12 @@ public class VerifyReportTest {
             webOrder = new WebOrder(driver, caseAccession);
             webOrder = webOrder.getOrderFromWeb();
 
-//            log.info("PDF " + pdfOrder);
-//            log.info("Web " + webOrder);
-//            pdfOrder.getMedications().forEach(System.out::println);
-            log.info(pdfOrder.getContentFromReport());
+//            log.info(pdfOrder.getContentFromReport());
+          /*  log.info("PDF " + pdfOrder);
+            log.info("Web " + webOrder);*/
+
+            log.info(pdfOrder.getCompound1Comments() + "   " + webOrder.getCompound1Comments() + "\n");
+            log.info(pdfOrder.getCompound2Comments() + "   " + webOrder.getCompound2Comments());
         } catch (InterruptedException e) {
             log.info(e);
         }

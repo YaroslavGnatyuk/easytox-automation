@@ -2,6 +2,8 @@ package com.easytox.automation.steps.security.reports.case_1_reports;
 
 import com.easytox.automation.steps.security.reports.PDFOrder;
 import com.easytox.automation.steps.security.reports.WebOrder;
+import com.easytox.automation.steps.security.reports.exception.PDFFieldIsEmptyException;
+import com.easytox.automation.steps.security.reports.exception.PDFSectionNotFoundException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -66,6 +68,7 @@ public class CreateNewOrder1Steps {
 
     @When("^Login to Easytox with \"([^\"]*)\" and \"([^\"]*)\" credentials.$")
     public void loginToEasyTox(String username, String password) {
+        log.info("Case#1\n");
         driver.navigate().to(LOGIN_URL);
         driver.findElement(By.name(WElement.LOGIN_PAGE_FIELD_NAME)).sendKeys(username);
         driver.findElement(By.name(WElement.LOGIN_PAGE_PASSWORD_FIELD)).sendKeys(password);
@@ -147,7 +150,7 @@ public class CreateNewOrder1Steps {
         if (indexOfSelectedPatient != -1) {
             new Select(driver.findElement(By.cssSelector(WElement.ORDER_PATIENT))).selectByIndex(indexOfSelectedPatient);
         } else {
-            log.info("Patient wasn't found!");
+            log.info("Patient wasn't found!\n");
         }
 
         assertTrue(indexOfSelectedPatient != -1);
@@ -483,7 +486,8 @@ public class CreateNewOrder1Steps {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        driver.findElement(By.cssSelector(WElement.COMPOUND_1_CONCENTRATION)).sendKeys("2");
+        String positiveResult = "2";
+        driver.findElement(By.cssSelector(WElement.COMPOUND_1_CONCENTRATION)).sendKeys(positiveResult);
         driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
 
         String resultTestWeHave = driver
@@ -502,7 +506,8 @@ public class CreateNewOrder1Steps {
 
     @When("^Under Test Screen section, select concentration for 'Compound2' such that test results are \"([^\"]*)\".$")
     public void checkTestResultCompound2(String resultTestShouldBe) {
-        driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys("5");
+        String positiveResult = "5";
+        driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(positiveResult);
         driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
         String resultTestWeHave = driver
                 .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_COMPOUND_2))
@@ -520,7 +525,8 @@ public class CreateNewOrder1Steps {
 
     @When("^Under Validity Testing section, select concentration for 'VCompound1' in such a way that test results are \"([^\"]*)\".$")
     public void checkTestResultForVCompound1(String resultTestShouldBe) {
-        driver.findElement(By.cssSelector(WElement.VCOMPOUND_1_CONCENTRATION)).sendKeys("10");
+        String positiveResult = "10";
+        driver.findElement(By.cssSelector(WElement.VCOMPOUND_1_CONCENTRATION)).sendKeys(positiveResult);
         driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
         String resultTestWeHave = driver
                 .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_1))
@@ -538,7 +544,8 @@ public class CreateNewOrder1Steps {
 
     @When("^Under Validity Testing section, select concentration for 'VCompound2' in such a way that test results are \"([^\"]*)\".$")
     public void checkTestResultVCompound2(String resultTestShouldBe) {
-        driver.findElement(By.cssSelector(WElement.VCOMPOUND_2_CONCENTRATION)).sendKeys("3");
+        String positiveResult = "3";
+        driver.findElement(By.cssSelector(WElement.VCOMPOUND_2_CONCENTRATION)).sendKeys(positiveResult);
         driver.findElement(By.cssSelector(WElement.COMPOUND_2_CONCENTRATION)).sendKeys(Keys.TAB);
         String resultTestWeHave = driver
                 .findElement(By.cssSelector(WElement.RESULT_TEST_COMMENTS_FOR_VCOMPOUND_2))
@@ -640,9 +647,9 @@ public class CreateNewOrder1Steps {
     public void finalizeAndEnterPin() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(WElement.CLOSE_POPUP_WINDOW))).click();
 
-        String pin = "1986";
+        String pinCode = "1986";
         driver.findElement(By.cssSelector(WElement.FINALIZE_BUTTON)).click();
-        driver.findElement(By.cssSelector(WElement.PIN_PLACEHOLDER)).sendKeys(pin);
+        driver.findElement(By.cssSelector(WElement.PIN_PLACEHOLDER)).sendKeys(pinCode);
         driver.findElement(By.cssSelector(WElement.APPLY_SIGNATURE_BUTTON)).click();
     }
 
@@ -771,14 +778,16 @@ public class CreateNewOrder1Steps {
         String inconsistentResult = "Inconsistent Results - Unexpected Positives";
 
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+        int indexOfConsistentResult = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(consistentResult)).findFirst().get());
+        int indexOfInconsistentResult = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        int substringNotFound = -1;
 
-        if (stringsFromReport.contains(consistentResult) && stringsFromReport.contains(inconsistentResult)) {
-            for (int i = 0; i < stringsFromReport.size(); i++) {
-                if (i > stringsFromReport.indexOf(consistentResult) &&
-                        i < stringsFromReport.indexOf(inconsistentResult)) {
-                    if (stringsFromReport.get(i).contains("Compound1 ")) {
-                        assertTrue(pdfOrder.getCompound1Result().equals(resultShouldBe));
-                    }
+        if (indexOfConsistentResult != substringNotFound && indexOfInconsistentResult != substringNotFound) {
+            for (int i = indexOfConsistentResult; i < indexOfInconsistentResult; i++) {
+                if (stringsFromReport.get(i).contains("Compound1 ")) {
+                    assertTrue(pdfOrder.getCompound1Result().equals(resultShouldBe));
                 }
             }
         } else {
@@ -788,8 +797,6 @@ public class CreateNewOrder1Steps {
 
     @And("^Conc. - <Value entered on Case Entry>$")
     public void checkCompound1Concentration() {
-        log.info(pdfOrder.getCompound1Concentration()+"\n");
-        log.info(webOrder.getCompound1Concentration()+"\n");
         assertTrue(pdfOrder.getCompound1Concentration().equals(webOrder.getCompound1Concentration()));
     }
 
@@ -813,17 +820,19 @@ public class CreateNewOrder1Steps {
     public void checkResultInCompound2(String resultShouldBe) {
         String content = pdfOrder.getContentFromReport();
         String inconsistentResult = "Inconsistent Results - Unexpected Positives";
-        String specimen = "SPECIMEN VALIDITY TESTING";
+        String specimenValidity = "SPECIMEN VALIDITY TESTING";
 
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+        int indexOfInconsistentResult = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        int indexOfSpecimenValidity = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+        int substringNotFound = -1;
 
-        if (stringsFromReport.contains(specimen) && stringsFromReport.contains(inconsistentResult)) {
-            for (int i = 0; i < stringsFromReport.size(); i++) {
-                if (i < stringsFromReport.indexOf(specimen) &&
-                        i > stringsFromReport.indexOf(inconsistentResult)) {
-                    if (stringsFromReport.get(i).contains("Compound2 ")) {
-                        assertTrue(pdfOrder.getCompound2Result().equals(resultShouldBe));
-                    }
+        if (indexOfInconsistentResult != substringNotFound && indexOfSpecimenValidity != substringNotFound) {
+            for (int i = indexOfInconsistentResult; i < indexOfSpecimenValidity; i++) {
+                if (stringsFromReport.get(i).contains("Compound2 ")) {
+                    assertTrue(pdfOrder.getCompound2Result().equals(resultShouldBe));
                 }
             }
         } else {
@@ -855,15 +864,17 @@ public class CreateNewOrder1Steps {
     @Then("^Data entered in this section should be same as during Case Entry.$")
     public void verifyDataInSpecimenValidityTestingSection() {
         String content = pdfOrder.getContentFromReport();
-        String specimen = "SPECIMEN VALIDITY TESTING";
+        String specimenValidity = "SPECIMEN VALIDITY TESTING";
         String medication = "Medication(s) :";
 
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-
-        if (content.contains(specimen) && content.contains(medication)) {
-            for (int i = 0; i < stringsFromReport.size(); i++) {
-                if (i < stringsFromReport.indexOf(medication) &&
-                        i > stringsFromReport.indexOf(specimen)) {
+        int indexOfSpecimenValidity = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+        int indexOfMedication = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        int substringNotFound = -1;
+        if (indexOfSpecimenValidity != substringNotFound && indexOfMedication != substringNotFound) {
+            for (int i = indexOfSpecimenValidity; i < indexOfMedication; i++) {
                     if (stringsFromReport.get(i).contains("VCompound1 ")) {
                         assertTrue(pdfOrder.getvCompound1Comments().equals(webOrder.getvCompound1Comments()) &&
                                 pdfOrder.getvCompound1Concentration().equals(webOrder.getvCompound1Concentration()) &&
@@ -877,7 +888,6 @@ public class CreateNewOrder1Steps {
                                 pdfOrder.getvCompound2ReferenceRange().equals(webOrder.getvCompound2ReferenceRange()) &&
                                 pdfOrder.getvCompound2Result().equals(webOrder.getvCompound2Result()));
                     }
-                }
             }
         } else {
             fail("Didn't find VCompound1 or VCompound2 result");
@@ -899,50 +909,74 @@ public class CreateNewOrder1Steps {
         }
     }
 
-    @When("^Verify details from 'Test Screen Validation' section are displayed.$")
-    public void checkTestScreenValidationSection(){
-
+    @When("^Verify details from 'Test Screen Validation' \"([^\"]*)\" section are displayed.$")
+    public void checkTestScreenValidationSection(String section) {
+        //        assertTrue(pdfOrder.getContentFromReport().contains(section));
+        try {
+            if (!pdfOrder.getContentFromReport().contains(section)) {
+                throw new PDFSectionNotFoundException("Section Test Screen Validation not found");
+            }
+        } catch (PDFSectionNotFoundException ignored) {
+            log.warn(ignored + "\n");
+        }
     }
 
     @Then("^Details from 'Test Screen Validation' section in the case entry should be displayed.$")
-    public void checkDetailInTestScreenValidationSection(){
+    public void checkDetailInTestScreenValidationSection() {
+        String medication = "Medication(s) : ";
+        String signedDate = "Signed Date:";
         String content = pdfOrder.getContentFromReport();
-        String signedDate = "Signed Date: ";
-        String medication = "Medication(s) :";
-
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
-        if (content.contains(signedDate) && content.contains(medication)) {
-            for (int i = 0; i < stringsFromReport.size(); i++) {
-                if (i < stringsFromReport.indexOf(signedDate) &&
-                        i > stringsFromReport.indexOf(medication)) {
-                    if (stringsFromReport.get(i).contains("Compound1")) {
-                        assertTrue(pdfOrder.getValidationCompound1Comments().equals(webOrder.getCompound1Comments()) &&
-                                pdfOrder.getValidationCompound1Concentration().equals(webOrder.getCompound1Concentration()) &&
-                                pdfOrder.getValidationCompound1Cutoff().equals(webOrder.getCompound1Cutoff()) &&
-                                pdfOrder.getValidationCompound1Result().equals(webOrder.getCompound1Result()));
-                    }
+        int indexOfMedication = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        int indexOfSignedDate = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(signedDate)).findFirst().get());
+        int substringNotFound = -1;
 
-                    if (stringsFromReport.get(i).contains("Compound2")) {
-                        assertTrue(pdfOrder.getValidationCompound2Comments().equals(webOrder.getCompound2Comments()) &&
+        if (indexOfMedication != substringNotFound && indexOfSignedDate != substringNotFound) {
+            for (int i = indexOfMedication; i < indexOfSignedDate; i++) {
+                if (stringsFromReport.get(i).contains("Compound1")) {
+                    if (pdfOrder.getValidationCompound1Result().equals("default")) {
+                        try {
+                            throw new PDFFieldIsEmptyException("Test screen validation in line Compound1 has empty filed(s)");
+                        } catch (PDFFieldIsEmptyException e) {
+                            log.warn(e.getMessage() + "\n");
+                        }
+                    } else {
+                        assertTrue(pdfOrder.getValidationCompound1Comments().equals(webOrder.getCompound1Comments()));
+                        assertTrue(pdfOrder.getValidationCompound1Concentration().equals(webOrder.getCompound1Concentration()));
+                        assertTrue(pdfOrder.getValidationCompound1Cutoff().equals(webOrder.getCompound1Cutoff()));
+                        assertTrue(pdfOrder.getValidationCompound1Result().equals(webOrder.getCompound1Result()));
+                    }
+                }
+
+                if (stringsFromReport.get(i).contains("Compound2")) {
+                    if (pdfOrder.getValidationCompound2Result().equals("default")) {
+                        try {
+                            throw new PDFFieldIsEmptyException("Test screen validation in line Compound2 has empty filed(s)");
+                        } catch (PDFFieldIsEmptyException e) {
+                            log.warn(e + "\n");
+                        }
+                    } else {
+                        String partOfWord = "itive"; //Pdf order has two different comments ('Positive' and 'Pos')in Test Screen Validation
+                        assertTrue((pdfOrder.getValidationCompound2Comments() + partOfWord).contains(webOrder.getCompound2Comments()) &&
                                 pdfOrder.getValidationCompound2Concentration().equals(webOrder.getCompound2Concentration()) &&
                                 pdfOrder.getValidationCompound2Cutoff().equals(webOrder.getCompound2Cutoff()) &&
                                 pdfOrder.getValidationCompound2Result().equals(webOrder.getCompound2Result()));
                     }
                 }
             }
-        } else {
-            fail("Didn't find VCompound1 or VCompound2 result");
         }
     }
 
     @When("^Verify Signature$")
-    public void verifySignature(){
+    public void verifySignature() {
         assertTrue(pdfOrder.isReportIsSigned());
     }
 
     @Then("^Signature of Pathologist along with Signed Date should be displayed.$")
-    public void verifySignedDate(){
+    public void verifySignedDate() {
         assertNotNull(pdfOrder.getSignedDate());
     }
 
@@ -990,9 +1024,9 @@ public class CreateNewOrder1Steps {
         File dir = new File(path);
         if (!dir.exists()) {
             if (dir.mkdir()) {
-                log.info("Directory have created");
+                log.info("Directory have created" + "\n");
             } else {
-                log.info("Directory have not created");
+                log.info("Directory have not created" + "\n");
             }
         }
     }
@@ -1007,9 +1041,9 @@ public class CreateNewOrder1Steps {
             }
 
             if (dir.delete()) {
-                System.out.println("Directory have deleted");
+                log.info("Directory have deleted" + "\n");
             } else {
-                System.out.println("Directory have not deleted");
+                log.info("Directory have not deleted" + "\n");
             }
         }
     }

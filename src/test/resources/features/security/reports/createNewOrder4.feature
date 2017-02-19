@@ -108,6 +108,19 @@ Feature: Security framework test
 
     When Verify the details displayed in 'Inconsistent Results - Unexpected Negatives for Medications' "Inconsistent Results - Unexpected Negatives for Medications" section.
     Then No values should be displayed in 'Inconsistent Results - Unexpected Negatives for Medications' section
-#
-#    When Verify the details displayed in 'Inconsistent Results - Unexpected Positives' "Inconsistent Results - Unexpected Positives" section.
-#    Then No values should be displayed in 'Inconsistent Results - Unexpected Positives' section
+
+    When Verify the details displayed in 'Inconsistent Results - Unexpected Positives' "Inconsistent Results - Unexpected Positives" section.
+    Then No values should be displayed in 'Inconsistent Results - Unexpected Positives' section
+
+    #    In bottom line in order to test case should be "Specimen Validity Testing" instead of "SPECIMEN VALIDITY TESTING"
+    When Verify the details displayed in 'Specimen Validity Testing' "SPECIMEN VALIDITY TESTING" section.
+    Then Data entered in this section should be same as the data entered in 'Specimen Validity Testing' section during Case Entry.
+
+    When Verify "Medication(s) :"
+    Then No values should be displayed under 'Medications'.
+
+    When Verify details from "Test Screen Validation" section Test Screen Validation are displayed .
+    Then Details from 'Test Screen Validation' section in the case entry should be displayed.
+
+    When Verify Signature
+    Then Signature of Pathologist along with Signed Date should be displayed.

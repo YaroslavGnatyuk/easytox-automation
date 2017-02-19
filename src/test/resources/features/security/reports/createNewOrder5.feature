@@ -86,3 +86,44 @@ Feature: Security framework test
 
     When Click Finalize and enter Sign Pin when it prompts for Sign Pin.
     Then Case should be finalized successfully.
+    #    Verify report
+    When Click on PDF icon under 'Report' column of finalized case.
+    Then Report should be opened in the PDF format.
+
+    When Verify the details displayed in the report.
+    Then Lab Name along with lab address should be displayed on the top right of the screen.
+
+    When Verify the details of order displayed in the report.
+    Then Following details should be displayed in the report: Accession Number: Value should match the data entered on Case entry
+    And Patient Name: Value should match the data entered on Case entry
+    And Patient DOB: Value should match the data entered on Case entry
+    And Collected Date: Value should match the data entered on Case entry
+    And Physician: Value should match the data entered on Case entry
+    And Sample Type: Value should match the data entered on Case entry
+    And Received in Lab: Value should match the data entered on Case entry
+
+    When Verify the details displayed in "Consistent Results-Reported Medication Detected" 'Consistent Results-Reported Medication Detected' section.
+    Then Following details Compound1, Compound2: Result - "POS"
+    And Conc. Compound1 and Compound2 - <Value entered on Case Entry>
+    And Cutoff Compound1 and Compound2 - <Value entered on Case Entry>
+    #   In bottom line in order to test case should be "Pos" instead of "Positive"
+    And Comments Compound1 and Compound2 - "Positive" and "Pos"
+
+    When Verify the details displayed in "Inconsistent Results - Unexpected Negatives for Medications" 'Inconsistent Results - Unexpected Negatives for Medications' section.
+    Then No values should be displayed in 'Inconsistent Results - Unexpected Negatives for Medications' section
+
+    When Verify the details displayed in "Inconsistent Results - Unexpected Positives" 'Inconsistent Results - Unexpected Positives' section.
+    Then No values should be displayed in 'Inconsistent Results - Unexpected Positives' section
+
+    #    In bottom line in order to test case should be "Specimen Validity Testing" instead of "SPECIMEN VALIDITY TESTING"
+    When Verify the details displayed in 'Specimen Validity Testing' "SPECIMEN VALIDITY TESTING" section.
+    Then Data entered in this section should be same as the data entered in 'Specimen Validity Testing' section during Case Entry.
+
+    When Verify "Medication(s) :"
+    Then "Drug1","Drug2" should be displayed under 'Medications'.
+
+    When Verify details from "Test Screen Validation" section Test Screen Validation are displayed .
+    Then Details from 'Test Screen Validation' section in the case entry should be displayed.
+
+    When Verify Signature
+    Then Signature of Pathologist along with Signed Date should be displayed.

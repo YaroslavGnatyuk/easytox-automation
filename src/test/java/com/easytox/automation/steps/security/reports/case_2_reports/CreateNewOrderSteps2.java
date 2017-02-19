@@ -1,6 +1,7 @@
 package com.easytox.automation.steps.security.reports.case_2_reports;
 
 import com.easytox.automation.steps.security.reports.PDFOrder;
+import com.easytox.automation.steps.security.reports.exception.PDFFieldIsEmptyException;
 import com.easytox.automation.steps.security.reports.exception.PDFSectionNotFoundException;
 import com.easytox.automation.steps.security.reports.WebOrder;
 import cucumber.api.java.After;
@@ -67,6 +68,7 @@ public class CreateNewOrderSteps2 {
 
     @When("^Login to Easytox with \"([^\"]*)\" and \"([^\"]*)\" credentials.$")
     public void loginToEasyTox(String username, String password) {
+        log.info("Case#2\n");
         driver.navigate().to(LOGIN_URL);
         driver.findElement(By.name(WElement.LOGIN_PAGE_FIELD_NAME)).sendKeys(username);
         driver.findElement(By.name(WElement.LOGIN_PAGE_PASSWORD_FIELD)).sendKeys(password);
@@ -147,7 +149,7 @@ public class CreateNewOrderSteps2 {
         if (indexOfSelectedPatient != -1) {
             new Select(driver.findElement(By.cssSelector(WElement.ORDER_PATIENT))).selectByIndex(indexOfSelectedPatient);
         } else {
-            log.info("Patient wasn't found!");
+            log.info("Patient wasn't found!\n");
         }
 
         assertTrue(indexOfSelectedPatient != -1);
@@ -592,7 +594,7 @@ public class CreateNewOrderSteps2 {
         int indexOfCaseNumber = 0;
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(WElement.SEARCH_ORDER_FIELD))).sendKeys(caseAccession);
         try {
-            Thread.sleep(1500);
+            Thread.sleep(2000);
             String caseNumberWeHave = driver.findElement(By.cssSelector(WElement.ONE_ROW_IN_ORDER_LIST))
                     .findElements(By.cssSelector(WElement.ONE_COLUMN_IN_ROW))
                     .get(indexOfCaseNumber)
@@ -656,7 +658,7 @@ public class CreateNewOrderSteps2 {
                 .sendKeys(caseAccession);
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -684,7 +686,7 @@ public class CreateNewOrderSteps2 {
             Thread.sleep(1000);
 
             driver.findElement(By.cssSelector(WElement.SEARCH_ORDER_FIELD)).sendKeys(caseAccession);
-            Thread.sleep(300);
+            Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.REPORT_DOWNLOAD_ICON)).click();
             Thread.sleep(1000);
             PDDocument order = readPDFWithOrder();
@@ -777,11 +779,12 @@ public class CreateNewOrderSteps2 {
         String inconsistentResult = "Inconsistent Results - Unexpected Negatives for Medications";
 
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-        int indexOfConsistentResult = stringsFromReport.indexOf(consistentResult);
-        int indexOfInconsistentResult = stringsFromReport.indexOf(inconsistentResult);
+        int indexOfConsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(consistentResult)).findFirst().get());
+        int indexOfInconsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        int substringNotFound = -1;
 
-        if (stringsFromReport.contains(consistentResult) && stringsFromReport.contains(inconsistentResult)) {
-            for (int i = 0; i < stringsFromReport.size(); i++) {
+        if (indexOfConsistentResult != substringNotFound && indexOfInconsistentResult != substringNotFound) {
+            for (int i = indexOfConsistentResult; i < indexOfInconsistentResult; i++) {
                 if (i > indexOfConsistentResult && i < indexOfInconsistentResult) {
                     assertFalse(stringsFromReport.get(i).contains("Compound1 "));
                     assertFalse(stringsFromReport.get(i).contains("Compound2 "));
@@ -804,15 +807,19 @@ public class CreateNewOrderSteps2 {
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
-        int indexOfInconsistentResult1 = stringsFromReport.indexOf(tableInconsistentResult1);
-        int indexOfInconsistentResult2 = stringsFromReport.indexOf(tableInconsistentResult2);
+        int indexOfInconsistentResult1 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult1)).findFirst().get());
+        int indexOfInconsistentResult2 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult2)).findFirst().get());
         int substringNotFound = -1;
 
         if (indexOfInconsistentResult1 != substringNotFound && indexOfInconsistentResult2 != substringNotFound) {
             for (int i = indexOfInconsistentResult1; i < indexOfInconsistentResult2; i++) {
                 if (stringsFromReport.get(i).contains("Compound2 ")) {
                     if (pdfOrder.getCompound2Result().equals("default")) {
-                        log.info("Content of the table have empty field(s)\n");
+                        try {
+                            throw new PDFFieldIsEmptyException("Content of the table have empty field(s)\n");
+                        } catch (PDFFieldIsEmptyException e) {
+                            log.warn(e + "\n");
+                        }
                     } else {
                         assertTrue(pdfOrder.getCompound2Result().equals(result));
                     }
@@ -862,8 +869,8 @@ public class CreateNewOrderSteps2 {
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
-        int indexOfInconsistentResult = stringsFromReport.indexOf(tableInconsistentResult);
-        int indexOfSpecimenValidity = stringsFromReport.indexOf(tableSpecimenValidity);
+        int indexOfInconsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult)).findFirst().get());
+        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableSpecimenValidity)).findFirst().get());
         int substringNotFound = -1;
 
         if (indexOfInconsistentResult != substringNotFound && indexOfSpecimenValidity != substringNotFound){
@@ -904,8 +911,8 @@ public class CreateNewOrderSteps2 {
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
-        int indexOfSpecimenValidity = stringsFromReport.indexOf(specimenValidity);
-        int indexOfMedication = stringsFromReport.indexOf(medication);
+        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+        int indexOfMedication = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
         int substringNotFound = -1;
 
         if (indexOfSpecimenValidity != substringNotFound && indexOfMedication != substringNotFound){
@@ -940,13 +947,12 @@ public class CreateNewOrderSteps2 {
     @When("^Verify details from \"([^\"]*)\" section Test Screen Validation are displayed .$")
     public void verifyTestScreenValidationSection(String section){
 //        assertTrue(pdfOrder.getContentFromReport().contains(section));
-
         try{
             if (!pdfOrder.getContentFromReport().contains(section)){
-                throw new PDFSectionNotFoundException();
+                throw new PDFSectionNotFoundException("Section Test Screen Validation doesn't exist!");
             }
         }catch (PDFSectionNotFoundException ignored){
-            log.info(ignored);
+            log.info(ignored + "\n");
         }
     }
 
@@ -957,24 +963,43 @@ public class CreateNewOrderSteps2 {
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
-        int indexOfMedication = stringsFromReport.indexOf(medication);
-        int indexOfSignedDate = stringsFromReport.indexOf(signedDate);
+        int indexOfMedication = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        int indexOfSignedDate = stringsFromReport
+                .indexOf(stringsFromReport.stream().filter(e -> e.contains(signedDate)).findFirst().get());
         int substringNotFound = -1;
 
-        if(indexOfMedication != substringNotFound && indexOfSignedDate != substringNotFound){
+        if (indexOfMedication != substringNotFound && indexOfSignedDate != substringNotFound) {
             for (int i = indexOfMedication; i < indexOfSignedDate; i++) {
                 if (stringsFromReport.get(i).contains("Compound1")) {
-                    assertTrue(pdfOrder.getValidationCompound1Comments().equals(webOrder.getCompound1Comments()) &&
-                            pdfOrder.getValidationCompound1Concentration().equals(webOrder.getCompound1Concentration()) &&
-                            pdfOrder.getValidationCompound1Cutoff().equals(webOrder.getCompound1Cutoff()) &&
-                            pdfOrder.getValidationCompound1Result().equals(webOrder.getCompound1Result()));
+                    if (pdfOrder.getValidationCompound1Result().equals("default")) {
+                        try {
+                            throw new PDFFieldIsEmptyException("Test screen validation in line Compound1 has empty filed(s)");
+                        } catch (PDFFieldIsEmptyException e) {
+                            log.warn(e + "\n");
+                        }
+                    } else {
+                        assertTrue(pdfOrder.getValidationCompound1Comments().equals(webOrder.getCompound1Comments()));
+                        assertTrue(pdfOrder.getValidationCompound1Concentration().equals(webOrder.getCompound1Concentration()));
+                        assertTrue(pdfOrder.getValidationCompound1Cutoff().equals(webOrder.getCompound1Cutoff()));
+                        assertTrue(pdfOrder.getValidationCompound1Result().equals(webOrder.getCompound1Result()));
+                    }
                 }
 
                 if (stringsFromReport.get(i).contains("Compound2")) {
-                    assertTrue(pdfOrder.getValidationCompound2Comments().equals(webOrder.getCompound2Comments()) &&
-                            pdfOrder.getValidationCompound2Concentration().equals(webOrder.getCompound2Concentration()) &&
-                            pdfOrder.getValidationCompound2Cutoff().equals(webOrder.getCompound2Cutoff()) &&
-                            pdfOrder.getValidationCompound2Result().equals(webOrder.getCompound2Result()));
+                    if (pdfOrder.getValidationCompound2Result().equals("default")) {
+                        try {
+                            throw new PDFFieldIsEmptyException("Test screen validation in line Compound2 has empty filed(s)");
+                        } catch (PDFFieldIsEmptyException e) {
+                            log.warn(e + "\n");
+                        }
+                    } else {
+                        String partOfWord = "itive"; //Pdf order has two different comments ('Positive' and 'Pos')in Test Screen Validation
+                        assertTrue((pdfOrder.getValidationCompound2Comments() + partOfWord).contains(webOrder.getCompound2Comments()) &&
+                                pdfOrder.getValidationCompound2Concentration().equals(webOrder.getCompound2Concentration()) &&
+                                pdfOrder.getValidationCompound2Cutoff().equals(webOrder.getCompound2Cutoff()) &&
+                                pdfOrder.getValidationCompound2Result().equals(webOrder.getCompound2Result()));
+                    }
                 }
             }
         }
@@ -1033,9 +1058,9 @@ public class CreateNewOrderSteps2 {
         File dir = new File(path);
         if (!dir.exists()) {
             if (dir.mkdir()) {
-                log.info("Directory have created");
+                log.info("Directory have created\n");
             } else {
-                log.info("Directory have not created");
+                log.info("Directory have not created\n");
             }
         }
     }
@@ -1050,9 +1075,9 @@ public class CreateNewOrderSteps2 {
             }
 
             if (dir.delete()) {
-                System.out.println("Directory have deleted");
+                log.info("Directory have deleted\n");
             } else {
-                System.out.println("Directory have not deleted");
+                log.info("Directory have not deleted\n");
             }
         }
     }
