@@ -1,9 +1,9 @@
 package com.easytox.automation.steps.security.reports.case_2_reports;
 
 import com.easytox.automation.steps.security.reports.PDFOrder;
+import com.easytox.automation.steps.security.reports.WebOrder;
 import com.easytox.automation.steps.security.reports.exception.PDFFieldIsEmptyException;
 import com.easytox.automation.steps.security.reports.exception.PDFSectionNotFoundException;
-import com.easytox.automation.steps.security.reports.WebOrder;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -33,20 +33,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class CreateNewOrderSteps2 {
     private WebDriver driver;
     private WebDriverWait wait;
     private Logger log = Logger.getLogger(CreateNewOrderSteps2.class);
 
-    private static final String LOGIN_URL = "http://bmtechsol.com:8080/easytox/";
-    private static final String ERROR_IN_LOGIN_URL = "http://bmtechsol.com:8080/easytox/?login_error=1&format=";
-    private static final String CREATE_NEW_ORDER_URL = "http://bmtechsol.com:8080/easytox/orderFrom/create";
+    private static final String LOGIN_URL = "http://162.243.2.94:8080/easytox/";
+    private static final String ERROR_IN_LOGIN_URL = "http://162.243.2.94:8080/easytox/?login_error=1&format=";
+    private static final String CREATE_NEW_ORDER_URL = "http://162.243.2.94:8080/easytox/orderFrom/create";
 
-    //    private static final String downloadFilepath = "/home/yroslav/temp";
+//        private static final String downloadFilepath = "/home/yroslav/temp";
     private static final String downloadFilepath = "C:\\easy_tox_temp\\";
 
     private int totalRecordsInOrderListBeforeCreationNewOrder = 0;
@@ -58,7 +56,7 @@ public class CreateNewOrderSteps2 {
 
     @Before
     public void init() {
-        //        System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
+//                System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver_linux");
         System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
         DesiredCapabilities capabilities = getChromePreferences();
         driver = new ChromeDriver(capabilities);

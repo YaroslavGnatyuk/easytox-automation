@@ -1,7 +1,6 @@
 package com.easytox.automation.steps.security.password_reset.case_2;
 
 import com.easytox.automation.driver.DriverBase;
-import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
@@ -21,9 +20,9 @@ import static junit.framework.TestCase.assertTrue;
 public class PasswordResetForLabUserSteps {
     private WebDriver driver;
     private Logger log = Logger.getLogger(PasswordResetForLabUserSteps.class);
-    private static final String easyToxAddress = "http://bmtechsol.com:8080/easytox/";
-    private static final String currentLabPage = "http://bmtechsol.com:8080/easytox/caseOrder/list"; //This address we have after successful logging
-    private static final String forgotPasswordScreenAddress = "http://bmtechsol.com:8080/easytox/actionItem/forgotPassword";
+    private static final String easyToxAddress = "http://162.243.2.94:8080/easytox/";
+    private static final String currentLabPage = "http://162.243.2.94:8080/easytox/lab/list"; //This address we have after successful logging
+    private static final String forgotPasswordScreenAddress = "http://162.243.2.94:8080/easytox/actionItem/forgotPassword";
     private static final String validEmailAddress = "someEmail@gmail.com";
     private static final String validUser = "LabUserone";
 
@@ -44,8 +43,6 @@ public class PasswordResetForLabUserSteps {
     public void checkCurrentScreen() {
         String headerTextShouldBe = "Sign In";
         String headerTextWeHave = driver.findElement(By.cssSelector(WElement.panelHeading)).getText();
-//        log.info(headerTextShouldBe + "\n");
-//        log.info(headerTextWeHave + "\n");
         assertTrue(headerTextWeHave.equals(headerTextShouldBe));
     }
 
@@ -101,15 +98,14 @@ public class PasswordResetForLabUserSteps {
         try {
             Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.pendingPasswordRequest)).click();
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
     @Then("^Following should be displayed:1 Password Requests$")
     public void isPasswordRequestShowed(){
-        boolean isPasswordRequestsShowed = driver
-                .findElement(By.cssSelector(WElement.passwordRequest))
-                .isDisplayed();
+        boolean isPasswordRequestsShowed = driver.findElement(By.cssSelector(WElement.passwordRequest)).isDisplayed();
         assertTrue(isPasswordRequestsShowed);
     }
     @And("^Forgot Password   LabUserOne <link>$")
@@ -177,8 +173,13 @@ public class PasswordResetForLabUserSteps {
 
     @When("^Enter a new password \"([^\"]*)\" in the \"New Password\" field and click Save.$")
     public void enterNewPassword(String newPassword){
-        driver.findElement(By.cssSelector(WElement.resetPasswordPage_newPasswordField)).sendKeys(newPassword);
-        driver.findElement(By.cssSelector(WElement.resetPasswordPage_saveButton)).click();
+        try {
+            driver.findElement(By.cssSelector(WElement.resetPasswordPage_newPasswordField)).sendKeys(newPassword);
+            Thread.sleep(1000);
+            driver.findElement(By.cssSelector(WElement.resetPasswordPage_saveButton)).click();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Then("^\"([^\"]*)\" message should be displayed.$")
@@ -334,7 +335,7 @@ public class PasswordResetForLabUserSteps {
     public void checkUserLogging(){
         try {
             Thread.sleep(1000);
-            String thePageShouldBe = "http://bmtechsol.com:8080/easytox/caseOrder/list";
+            String thePageShouldBe = "http://162.243.2.94:8080/easytox/caseOrder/list";
             String thePageWeHave = driver.getCurrentUrl();
 
             assertTrue(thePageWeHave.equals(thePageShouldBe));
@@ -343,16 +344,16 @@ public class PasswordResetForLabUserSteps {
         }
     }
 
-    @After
+   /* @After
     public void close() {
         driver.close();
-    }
+    }*/
 
     private void signOut(){
         try {
-            Thread.sleep(500);
-            driver.findElement(By.cssSelector(WElement.loginDropDown)).click();
-            Thread.sleep(500);
+            Thread.sleep(1000);
+            driver.findElement(By.cssSelector(WElement.LOGIN_DROP_DOWN_ANOTHER)).click();
+            Thread.sleep(1000);
             driver.findElement(By.cssSelector(WElement.signOutField)).click();
         } catch (InterruptedException e) {
             e.printStackTrace();

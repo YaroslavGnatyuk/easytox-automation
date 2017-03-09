@@ -1,7 +1,7 @@
 Feature: Security framework test
 
   Scenario: Password Reset for a lab user
-    When Launch application using link: "http://bmtechsol.com:8080/easytox/"
+    When Launch application using link: "http://162.243.2.94:8080/easytox/"
     Then Easytox Login screen should be displayed.
 
     When Click "Click here" link on Forgot Password.
@@ -10,7 +10,7 @@ Feature: Security framework test
     When Enter Username as "LabUserone", valid email address and click "Send my Password" button.
     Then "Forgot Password Request Submitted" message should be displayed on the page.
 
-    When Login to Easytox with "SNLabAdmin" and "Test@123" credentials.
+    When Login to Easytox with "superadmin" and "admin" credentials.
     Then User login should be successful.
 
     When Click "Pending Password Requests" link.

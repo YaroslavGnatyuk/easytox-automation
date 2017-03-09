@@ -16,7 +16,7 @@ interface WElement {
     String loginPage_loginButton = "button.btn.btn-md.btn-primary";
     String loginPage_passwordChangedSuccessfullyMessage = "body > div > div > div > div > div.panel-body > div";
 
-    String pendingPasswordRequest = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li:nth-child(6) > a";
+    String pendingPasswordRequest = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li:nth-child(1) > a > i";
     String passwordRequest = "#pendingpasswordrequests > li.dropdown-header.bordered-darkorange";
     String userRequestLine = "#pendingpasswordrequests > li";
 
@@ -33,7 +33,8 @@ interface WElement {
     String resetPasswordPage_saveButton = "#form > fieldset > div:nth-child(4) > div > input";
 
     String resultOfChangePassword = "#maincontentdiv > div.page-body > div.alert.alert-success.fade.in";
-    String loginDropDown = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li:nth-child(7) > a > section > h2 > span";
+    String loginDropDown = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li.open > a";
+    String LOGIN_DROP_DOWN_ANOTHER = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li:nth-child(2) > a";
     String signOutField = "body > div.navbar > div > div > div.navbar-header.pull-right > div > ul > li.open > ul > li.dropdown-footer > a";
 
     String changePasswordPage_usernameField = "#username";
