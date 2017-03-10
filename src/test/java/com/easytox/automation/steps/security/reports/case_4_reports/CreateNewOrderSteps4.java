@@ -26,16 +26,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class CreateNewOrderSteps4 {
     private WebDriver driver;
@@ -117,8 +111,12 @@ public class CreateNewOrderSteps4 {
         List<WebElement> locations =
                 new Select(driver.findElement(By.cssSelector(WElement.ORDER_LOCATION)))
                         .getOptions();
-        List<String> itemsLocation = locations.stream().map(WebElement::getText).collect(Collectors.toList());
-
+// TODO: 3/10/17 remove this comment
+//        List<String> itemsLocation = locations.stream().map(WebElement::getText).collect(Collectors.toList());
+        List<String> itemsLocation = new ArrayList<>();
+        for (int i = 0; i < locations.size(); i++) {
+            itemsLocation.add(locations.get(i).getText());
+        }
         assertTrue(itemsLocation.contains(labClient));
     }
 
@@ -251,15 +249,26 @@ public class CreateNewOrderSteps4 {
 
     @When("Select Pathologist as \"([^\"]*)\"")
     public void selectThePathologist(String pathologist) {
-        Optional<WebElement> patholog = new Select(driver
+        // TODO: 3/10/17 remove this comment
+        /*Optional<WebElement> patholog = new Select(driver
                 .findElement(By.cssSelector(WElement.PATHOLOGIST_GROUP))
                 .findElement(By.cssSelector(WElement.ORDER_SELECT_PATHOLOGIST)))
                 .getOptions()
-                .stream().filter(e -> e.getText().equals(pathologist)).findFirst();
+                .stream().filter(e -> e.getText().equals(pathologist)).findFirst();*/
+        List<WebElement> elements = new Select(driver
+                .findElement(By.cssSelector(WElement.PATHOLOGIST_GROUP))
+                .findElement(By.cssSelector(WElement.ORDER_SELECT_PATHOLOGIST)))
+                .getOptions();
 
-        if (patholog.isPresent()) {
-            patholog.get().click();
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).getText().equals(pathologist)){
+                elements.get(i).click();
+                break;
+            }
         }
+       /* if (patholog.isPresent()) {
+            patholog.get().click();
+        }*/
     }
 
     @Then("^User selection of Pathologist \"([^\"]*)\" should be successful.$")
@@ -776,11 +785,28 @@ public class CreateNewOrderSteps4 {
         String inconsistentResult = "Inconsistent Results - Unexpected Negatives for Medications";
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-
-        int indexOfConsistentResult = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(consistentResult)).findFirst().get());
+        // TODO: 3/10/17 remove this comment
+//        int indexOfConsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(consistentResult)).findFirst().get());
+        String firstConsistentResult = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(consistentResult)){
+                firstConsistentResult = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfConsistentResult = stringsFromReport.indexOf(firstConsistentResult);
+        // TODO: 3/10/17 remove this comment
+//        int indexOfInconsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        String firstInconsistentResult = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(inconsistentResult)){
+                firstInconsistentResult = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfInconsistentResult = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+                .indexOf(firstInconsistentResult);
+
         int substringNotFound = -1;
 
         if (indexOfConsistentResult != substringNotFound && indexOfInconsistentResult != substringNotFound) {
@@ -804,10 +830,30 @@ public class CreateNewOrderSteps4 {
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
+        // TODO: 3/10/17 remove this comment
+//        int indexOfInconsistentResult1 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        String firstInconsistentResult = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(inconsistentResult1)){
+                firstInconsistentResult = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfInconsistentResult1 = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult1)).findFirst().get());
+                .indexOf(firstInconsistentResult);
+
+        // TODO: 3/10/17 remove this comment
+//        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+        String firstSpecimenValidity = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(specimenValidity)){
+                firstSpecimenValidity = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfSpecimenValidity = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+                .indexOf(firstSpecimenValidity);
+
         int subStringNotFound = -1;
         if (indexOfInconsistentResult1 != subStringNotFound && indexOfSpecimenValidity != subStringNotFound) {
             for (int i = indexOfInconsistentResult1; i < indexOfSpecimenValidity; i++) {
@@ -838,10 +884,29 @@ public class CreateNewOrderSteps4 {
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
+        // TODO: 3/10/17 remove this comment
+//        int indexOfInconsistentResult1 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        String firstInconsistentResult = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(inconsistentResult1)){
+                firstInconsistentResult = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfInconsistentResult1 = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult1)).findFirst().get());
+                .indexOf(firstInconsistentResult);
+
+        // TODO: 3/10/17 remove this comment
+//        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+        String firstSpecimenValidity = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(specimenValidity)){
+                firstSpecimenValidity = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfSpecimenValidity = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+                .indexOf(firstSpecimenValidity);
         int subStringNotFound = -1;
 
         if (indexOfInconsistentResult1 != subStringNotFound && indexOfSpecimenValidity != subStringNotFound) {
@@ -864,11 +929,28 @@ public class CreateNewOrderSteps4 {
         String medication = "Medication(s) :";
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-
+        // TODO: 3/10/17 remove this comment
+//        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+        String firstSpecimenValidity = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(specimenValidity)) {
+                firstSpecimenValidity = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfSpecimenValidity = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+                .indexOf(firstSpecimenValidity);
+        // TODO: 3/10/17 remove this comment
+//        int indexOfMedication = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        String firstMedication = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(medication)) {
+                firstMedication = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfMedication = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+                .indexOf(firstMedication);
         int substringNotFound = -1;
 
         if (indexOfSpecimenValidity != substringNotFound && indexOfMedication != substringNotFound) {
@@ -921,11 +1003,30 @@ public class CreateNewOrderSteps4 {
         String signedDate = "Signed Date:";
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-
+        // TODO: 3/10/17 remove this comment
+//        int indexOfMedication = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        String firstMedication = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(medication)) {
+                firstMedication = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfMedication = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+                .indexOf(firstMedication);
+
+        // TODO: 3/10/17 remove this comment
+//        int indexOfSignedDate = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(signedDate)).findFirst().get());
+        String firstSignedDate = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(signedDate)) {
+                firstSignedDate = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfSignedDate = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(signedDate)).findFirst().get());
+                .indexOf(firstSignedDate);
+
         int substringNotFound = -1;
 
         if (indexOfMedication != substringNotFound && indexOfSignedDate != substringNotFound) {
@@ -1030,7 +1131,10 @@ public class CreateNewOrderSteps4 {
 
             File[] allFiles = dir.listFiles();
             if (allFiles != null && allFiles.length != 0) {
-                Arrays.stream(allFiles).forEach(File::delete);
+                //                Arrays.stream(allFiles).forEach(File::delete);
+                for (int i = 0; i < allFiles.length; i++) {
+                    allFiles[i].delete();
+                }
             }
 
             if (dir.delete()) {

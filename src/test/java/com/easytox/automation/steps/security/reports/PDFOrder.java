@@ -9,8 +9,10 @@ import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class PDFOrder extends Order {
     private PDDocument order;
@@ -54,9 +56,14 @@ public class PDFOrder extends Order {
     private void setSignedDate(final String stringFromReport) {
         String signedDate = "Signed Date: ";
         if (stringFromReport.contains(signedDate)) {
-            List<String> data = Arrays.stream(stringFromReport.split(":"))
+            // TODO: 3/10/17 remove this comment
+            /*List<String> data = Arrays.stream(stringFromReport.split(":"))
                     .map(String::trim)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList());*/
+            List<String> data = new ArrayList<>(Arrays.asList(stringFromReport.split(":")));
+            for (int j = 0; j < data.size(); j++) {
+                data.set(j,data.get(j).trim());
+            }
             int indexOfDate = 1;
             this.signedDate = data.get(indexOfDate);
         }
@@ -106,10 +113,14 @@ public class PDFOrder extends Order {
                 if (i < indexOfSignedDate && i > indexOfMedication) {
                     if (stringsFromReport.get(i).contains(compound1)) {
                         String tempStringFromReport = stringsFromReport.get(i).replace(compound1, "");
-
-                        List<String> data = Arrays.stream(tempStringFromReport.split(" "))
+                        // TODO: 3/10/17 remove this comment
+                        /*List<String> data = Arrays.stream(tempStringFromReport.split(" "))
                                 .map(String::trim)
-                                .collect(Collectors.toList());
+                                .collect(Collectors.toList());*/
+                        List<String> data = new ArrayList<>(Arrays.asList(tempStringFromReport.split(" ")));
+                        for (int j = 0; j < data.size(); j++) {
+                            data.set(j,data.get(j).trim());
+                        }
                         if (data.size() < 4) {
                             super.setValidationCompound1Result("default");
                             super.setValidationCompound1Cutoff("default");
@@ -124,10 +135,15 @@ public class PDFOrder extends Order {
                     }
                     if (stringsFromReport.get(i).contains(compound2)) {
                         String tempStringFromReport = stringsFromReport.get(i).replace(compound2, "");
-
-                        List<String> data = Arrays.stream(tempStringFromReport.split(" "))
+                        // TODO: 3/10/17 remove this comment
+                        /*List<String> data = Arrays.stream(tempStringFromReport.split(" "))
                                 .map(String::trim)
-                                .collect(Collectors.toList());
+                                .collect(Collectors.toList());*/
+
+                        List<String> data = new ArrayList<>(Arrays.asList(tempStringFromReport.split(" ")));
+                        for (int j = 0; j < data.size(); j++) {
+                            data.set(j,data.get(j).trim());
+                        }
                         if (data.size() < 4) {
                             super.setValidationCompound2Result("default");
                             super.setValidationCompound2Cutoff("default");
@@ -154,8 +170,10 @@ public class PDFOrder extends Order {
                 return;
             }
 
-            List<String> data = new ArrayList<>();
-            Collections.addAll(data, Arrays.stream(stringWithMedicationFromReport.split(",")).toArray(String[]::new));
+            String []arrayFromReport = stringWithMedicationFromReport.split(",");
+            List<String> data = new ArrayList<>(Arrays.asList(arrayFromReport));
+            // TODO: 3/10/17 remove this comment
+//            Collections.addAll(data, Arrays.stream(stringWithMedicationFromReport.split(",")).toArray(String[]::new));
 
             for (int i = 0; i < data.size(); i++) {
                 data.set(i, data.get(i).trim());
@@ -171,8 +189,11 @@ public class PDFOrder extends Order {
         if (stringFromReport.contains(vCompound1)) {
             String tempStringFromReport = stringFromReport.replace(vCompound1, "");
 
-            List<String> data = new ArrayList<>();
-            Collections.addAll(data, Arrays.stream(tempStringFromReport.split(" ")).toArray(String[]::new));
+            String []arrayFromReport = tempStringFromReport.split(" ");
+            List<String> data = new ArrayList<>(Arrays.asList(arrayFromReport));
+
+            // TODO: 3/10/17 remove this comment
+//            Collections.addAll(data, Arrays.stream(tempStringFromReport.split(" ")).toArray(String[]::new));
 
             //I compound two last words here, because I separated those two words in previous line.
             StringBuilder result = new StringBuilder(data.get(data.size() - 2) + " " + data.get(data.size() - 1));
@@ -205,8 +226,10 @@ public class PDFOrder extends Order {
         if (stringFromReport.contains(vCompound2)) {
             String tempStringFromReport = stringFromReport.replace(vCompound2, "");
 
-            List<String> data = new ArrayList<>();
-            Collections.addAll(data, Arrays.stream(tempStringFromReport.split(" ")).toArray(String[]::new));
+            String []arrayFromReport = tempStringFromReport.split(" ");
+            List<String> data = new ArrayList<>(Arrays.asList(arrayFromReport));
+            // TODO: 3/10/17 remove this comment
+//            Collections.addAll(data, Arrays.stream(tempStringFromReport.split(" ")).toArray(String[]::new));
 
             //I compound two last words here, because I separated those two words in previous line.
             StringBuilder result = new StringBuilder(data.get(data.size() - 2) + " " + data.get(data.size() - 1));
@@ -297,7 +320,7 @@ public class PDFOrder extends Order {
     private String correctPatientName(String patientName) {
         int firstName = 0, lastName = 1;
         String[] name = patientName.split("  ");
-        return patientName = name[firstName] + " " + name[lastName];
+        return name[firstName] + " " + name[lastName];
     }
 
     private void setAccession(final String stringFromReport) {

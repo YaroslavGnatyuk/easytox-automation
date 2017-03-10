@@ -13,7 +13,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertNotNull;
@@ -117,16 +116,25 @@ public class PasswordResetForLabAdminSteps {
 
         String request = "ForgotPassword " + labClient;
         List<WebElement> li = driver.findElements(By.cssSelector(WElement.userRequestLine));
-        Optional<String> result = li.stream()
+        //todo remove this comment
+        /*Optional<String> result = li.stream()
                 .map(e -> e.getText().replace("\n", " "))
                 .filter(e -> e.equals(request))
-                .findAny();
+                .findAny();*/
+        boolean isPresentRequest = false;
+        for (int i = 0; i < li.size(); i++) {
+            String userRequest = li.get(i).getText().replace("\n", " ");
+            if(userRequest.equals(request)){
+                isPresentRequest = true;
+                break;
+            }
+        }
 
-        if (!result.isPresent()) {
+        if (!isPresentRequest) {
             assertTrue(isExistLabClient(labClient));
             driver.findElement(By.cssSelector(WElement.pendingPasswordRequest)).click(); //open dropdown window to continue tests
         } else {
-            assertTrue(result.isPresent());
+            assertTrue(isPresentRequest);
         }
     }
 
@@ -140,7 +148,17 @@ public class PasswordResetForLabAdminSteps {
     public void selectLabUserOne(String labClient) {
         String request = "ForgotPassword\n" + labClient;
         List<WebElement> li = driver.findElements(By.cssSelector(WElement.userRequestLine));
-        boolean isLabClientExist = li.stream().filter(e -> e.getText().equals(request)).findAny().isPresent();
+        //// TODO: 3/10/17 remove this comment
+//        boolean isLabClientExist = li.stream().filter(e -> e.getText().equals(request)).findAny().isPresent();
+        boolean isLabClientExist = false;
+        for (int i = 0; i < li.size(); i++) {
+            String userRequest = li.get(i).getText();
+            if (userRequest.equals(request)){
+                isLabClientExist = true;
+                break;
+            }
+        }
+
         if (!isLabClientExist) {
             getLabClient(labClient).findElement(By.cssSelector(WElement.resetUserPasswordButton)).click();
         }

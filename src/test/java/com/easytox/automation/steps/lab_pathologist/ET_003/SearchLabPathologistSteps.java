@@ -11,8 +11,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class SearchLabPathologistSteps {
     private WebDriver driver;
-    private static final String easyToxAddress = "http://bmtechsol.com:8080/easytox/";
+    private static final String easyToxAddress = "http://162.243.2.94:8080/easytox/";
 
     private Logger log = Logger.getLogger(SearchLabPathologistSteps.class);
 
@@ -79,12 +79,15 @@ public class SearchLabPathologistSteps {
 
     @Then("^Matching records with entered data(.*) should be displayed in the Lab Pathologist List.$")
     public void matchingData(String criteria) {
-            List<WebElement> elements = driver
-                    .findElement(By.cssSelector(WElement.resultSearching))
-                    .findElements(By.cssSelector(WElement.oneRowInResultSearching));
-            List<String> text = elements.stream().map(WebElement::getText).collect(Collectors.toList());
-
-            assertTrue(text.contains(criteria.trim()));
+        List<WebElement> elements = driver
+                .findElement(By.cssSelector(WElement.resultSearching))
+                .findElements(By.cssSelector(WElement.oneRowInResultSearching));
+//            List<String> text = elements.stream().map(WebElement::getText).collect(Collectors.toList());
+        List<String> text = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            text.add(elements.get(i).getText());
+        }
+        assertTrue(text.contains(criteria.trim()));
     }
 
 

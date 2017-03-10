@@ -1,6 +1,7 @@
 package com.easytox.automation.steps.security.password_reset.case_2;
 
 import com.easytox.automation.driver.DriverBase;
+import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
@@ -11,7 +12,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertNotNull;
@@ -112,11 +112,19 @@ public class PasswordResetForLabUserSteps {
     public void isForgotPasswordShowed(){
         String request = "ForgotPassword LabUserone";
         List<WebElement> li = driver.findElements(By.cssSelector(WElement.userRequestLine));
-        Optional<String> result = li.stream()
+        /*Optional<String> result = li.stream()
                 .map(e->e.getText().replace("\n"," "))
                 .filter(e->e.equals(request))
-                .findAny();
-        assertTrue(result.isPresent());
+                .findAny();*/
+        //// TODO: 3/10/17 remove this comment
+        boolean result = false;
+        for (int i = 0; i < li.size(); i++) {
+            if (li.get(i).getText().equals(request)){
+                result = true;
+                break;
+            }
+        }
+        assertTrue(result);
     }
     @And("^See All Requests <Link>$")
     public void isAllRequestLinkShowed(){
@@ -128,7 +136,13 @@ public class PasswordResetForLabUserSteps {
     public void selectLabUserOne(){
         String request = "ForgotPassword\nLabUserone";
         List<WebElement> li = driver.findElements(By.cssSelector(WElement.userRequestLine));
-        li.stream().filter(e->e.getText().equals(request)).findAny().get().click();
+//        li.stream().filter(e->e.getText().equals(request)).findAny().get().click();
+        //// TODO: 3/10/17 remove this comment
+        for (int i = 0; i < li.size(); i++) {
+            if(li.get(i).getText().equals(request)){
+                li.get(i).click();
+            }
+        }
     }
 
     @Then("^Reset Password screen with following fields should be displayed: Request by: Labuserone$")
@@ -248,8 +262,6 @@ public class PasswordResetForLabUserSteps {
             String autoPopulatedUsernameWeHave = driver
                     .findElement(By.cssSelector(WElement.changePasswordPage_usernameField))
                     .getAttribute("value");
-//            log.info(autoPopulatedUsername + "\n");
-//            log.info(autoPopulatedUsernameWeHave + "\n");
             assertTrue(autoPopulatedUsername.equals(autoPopulatedUsernameWeHave));
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -344,10 +356,10 @@ public class PasswordResetForLabUserSteps {
         }
     }
 
-   /* @After
+    @After
     public void close() {
         driver.close();
-    }*/
+    }
 
     private void signOut(){
         try {

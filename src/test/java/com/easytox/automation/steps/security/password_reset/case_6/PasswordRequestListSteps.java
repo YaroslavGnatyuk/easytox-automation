@@ -12,7 +12,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertNotNull;
@@ -80,16 +79,23 @@ public class PasswordRequestListSteps {
 
         String request = "ForgotPassword " + labClient;
         List<WebElement> li = driver.findElements(By.cssSelector(WElement.userRequestLine));
-        Optional<String> result = li.stream()
+        // TODO: 3/10/17 remove this comment
+        /*Optional<String> result = li.stream()
                 .map(e -> e.getText().replace("\n", " "))
                 .filter(e -> e.equals(request))
-                .findAny();
-
-        if (!result.isPresent()) {
+                .findAny();*/
+        boolean result = false;
+        for (int i = 0; i < li.size(); i++) {
+            if(li.get(i).getText().equals(request)){
+                result = true;
+                break;
+            }
+        }
+        if (!result) {
             assertTrue(isExistLabClient(labClient));
             driver.findElement(By.cssSelector(WElement.pendingPasswordRequest)).click(); //open dropdown window to continue tests
         } else {
-            assertTrue(result.isPresent());
+            assertTrue(true);
         }
     }
 

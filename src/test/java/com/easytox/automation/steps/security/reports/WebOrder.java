@@ -3,10 +3,11 @@ package com.easytox.automation.steps.security.reports;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by yroslav on 2/3/17.
@@ -92,12 +93,18 @@ public class WebOrder extends Order {
         String vCompound2Comments = driver
                 .findElement(By.cssSelector("#compounds > div > div > div.panel.panel-info > div.panel-body > div:nth-child(8) > div > div:nth-child(5) > div > div.col-sm-9 > div > input"))
                 .getAttribute("value");
-
-        List<String> drugs = driver
+        // TODO: 3/10/17 remove this comment
+        /*List<String> drugs = driver
                 .findElements(By.className("select2-selection__choice"))
                 .stream()
                 .map(e -> e.getAttribute("title"))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+
+        List<WebElement> elements = driver.findElements(By.className("select2-selection__choice"));
+        List<String> drugs = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            drugs.add(elements.get(i).getAttribute("title"));
+        }
 
         super.setPatientName(patientName);
         super.setPatientDOB(patientDOB);

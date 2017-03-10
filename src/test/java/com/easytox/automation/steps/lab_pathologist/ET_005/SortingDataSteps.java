@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
@@ -82,8 +81,13 @@ public class SortingDataSteps {
         List<WebElement> elements = driver
                 .findElement(By.cssSelector(WElement.rowWithColumnsName))
                 .findElements(By.cssSelector(WElement.columnsName));
-
-        elements.stream().filter(element -> element.getText().equals(column)).forEach(WebElement::click); //I search "column" and make sorting by column in table on view
+        // TODO: 3/10/17 remove this comment
+//        elements.stream().filter(element -> element.getText().equals(column)).forEach(WebElement::click); //I search "column" and make sorting by column in table on view
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).getText().equals(column)) {
+                elements.get(i).click();
+            }
+        }
 
         sortedColumns = getTextOfOneColumnFromTableBody(column);
         if (column.equals("Medicaid Num") || column.equals("Medicare Num")) {
@@ -107,8 +111,13 @@ public class SortingDataSteps {
         List<WebElement> elements = driver
                 .findElement(By.cssSelector(WElement.rowWithColumnsName))
                 .findElements(By.cssSelector(WElement.columnsName));
-
-        elements.stream().filter(element -> element.getText().equals(column)).forEach(WebElement::click); //I make sorting by column in table on view
+        // TODO: 3/10/17 Remove this comment
+//        elements.stream().filter(element -> element.getText().equals(column)).forEach(WebElement::click); //I make sorting by column in table on view
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).getText().equals(column)) {
+                elements.get(i).click();
+            }
+        }
 
         sortedColumns = getTextOfOneColumnFromTableBody(column);
         if (column.equals("Medicaid Num") || column.equals("Medicare Num")) {
@@ -186,7 +195,13 @@ public class SortingDataSteps {
             default:
                 log.info("No case for this column.");
         }
-        return elements.stream().map(WebElement::getText).collect(Collectors.toList());
+        List<String> allLinesFromOneColumn = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            allLinesFromOneColumn.add(elements.get(i).getText());
+        }
+        // TODO: 3/10/17 remove this comment
+//        return elements.stream().map(WebElement::getText).collect(Collectors.toList());
+        return allLinesFromOneColumn;
     }
 
     private class SortAscendIgnoreCase implements Comparator<Object> { // I make sorting ignore case because column in table sorts in the same way
@@ -204,8 +219,8 @@ public class SortingDataSteps {
             String s1 = (String) o1;
             String s2 = (String) o2;
             int resultOfCompering = s1.toLowerCase().compareTo(s2.toLowerCase());
-            if(resultOfCompering > 0) return -1;
-            if(resultOfCompering < 0) return 1;
+            if (resultOfCompering > 0) return -1;
+            if (resultOfCompering < 0) return 1;
             return 0;
         }
     }
@@ -239,8 +254,8 @@ public class SortingDataSteps {
 
             int resultOfCompering = i1.compareTo(i2);
 
-            if(resultOfCompering > 0) return -1;
-            if(resultOfCompering < 0) return 1;
+            if (resultOfCompering > 0) return -1;
+            if (resultOfCompering < 0) return 1;
 
             return 0;
         }

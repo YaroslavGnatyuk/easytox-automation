@@ -26,11 +26,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
@@ -44,7 +40,7 @@ public class CreateNewOrderSteps2 {
     private static final String ERROR_IN_LOGIN_URL = "http://162.243.2.94:8080/easytox/?login_error=1&format=";
     private static final String CREATE_NEW_ORDER_URL = "http://162.243.2.94:8080/easytox/orderFrom/create";
 
-//        private static final String downloadFilepath = "/home/yroslav/temp";
+    //        private static final String downloadFilepath = "/home/yroslav/temp";
     private static final String downloadFilepath = "C:\\easy_tox_temp\\";
 
     private int totalRecordsInOrderListBeforeCreationNewOrder = 0;
@@ -115,8 +111,12 @@ public class CreateNewOrderSteps2 {
         List<WebElement> locations =
                 new Select(driver.findElement(By.cssSelector(WElement.ORDER_LOCATION)))
                         .getOptions();
-        List<String> itemsLocation = locations.stream().map(WebElement::getText).collect(Collectors.toList());
-
+        // TODO: 3/10/17 remove this comment
+//        List<String> itemsLocation = locations.stream().map(WebElement::getText).collect(Collectors.toList());
+        List<String> itemsLocation = new ArrayList<>();
+        for (int i = 0; i < locations.size(); i++) {
+            itemsLocation.add(locations.get(i).getText());
+        }
         assertTrue(itemsLocation.contains(labClient));
     }
 
@@ -251,15 +251,27 @@ public class CreateNewOrderSteps2 {
 
     @When("Select Pathologist as \"([^\"]*)\"")
     public void selectThePathologist(String pathologist) {
-        Optional<WebElement> patholog = new Select(driver
+        // TODO: 3/10/17 remove this comments
+        /*Optional<WebElement> patholog = new Select(driver
                 .findElement(By.cssSelector(WElement.PATHOLOGIST_GROUP))
                 .findElement(By.cssSelector(WElement.ORDER_SELECT_PATHOLOGIST)))
                 .getOptions()
-                .stream().filter(e -> e.getText().equals(pathologist)).findFirst();
+                .stream().filter(e -> e.getText().equals(pathologist)).findFirst();*/
 
-        if (patholog.isPresent()) {
-            patholog.get().click();
+        List<WebElement> elements = new Select(driver
+                .findElement(By.cssSelector(WElement.PATHOLOGIST_GROUP))
+                .findElement(By.cssSelector(WElement.ORDER_SELECT_PATHOLOGIST)))
+                .getOptions();
+
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).getText().equals(pathologist)) {
+                elements.get(i).click();
+                break;
+            }
         }
+        /*if (patholog.isPresent()) {
+            patholog.get().click();
+        }*/
     }
 
     @Then("^User selection of Pathologist \"([^\"]*)\" should be successful.$")
@@ -777,8 +789,29 @@ public class CreateNewOrderSteps2 {
         String inconsistentResult = "Inconsistent Results - Unexpected Negatives for Medications";
 
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-        int indexOfConsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(consistentResult)).findFirst().get());
-        int indexOfInconsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        // TODO: 3/10/17 remove this comment
+//        int indexOfConsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(consistentResult)).findFirst().get());
+        String firstConsistentResult = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(consistentResult)){
+                firstConsistentResult = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfConsistentResult = stringsFromReport.indexOf(firstConsistentResult);
+
+        // TODO: 3/10/17 remove this comment
+//        int indexOfInconsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(inconsistentResult)).findFirst().get());
+        String firstInconsistentResult = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(inconsistentResult)){
+                firstInconsistentResult = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfInconsistentResult = stringsFromReport
+                .indexOf(firstInconsistentResult);
+
         int substringNotFound = -1;
 
         if (indexOfConsistentResult != substringNotFound && indexOfInconsistentResult != substringNotFound) {
@@ -805,8 +838,30 @@ public class CreateNewOrderSteps2 {
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
 
-        int indexOfInconsistentResult1 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult1)).findFirst().get());
-        int indexOfInconsistentResult2 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult2)).findFirst().get());
+        // TODO: 3/10/17 remove this comment
+//        int indexOfInconsistentResult1 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult1)).findFirst().get());
+        String firstInconsistentResult1 = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(tableInconsistentResult1)){
+                firstInconsistentResult1 = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfInconsistentResult1 = stringsFromReport
+                .indexOf(firstInconsistentResult1);
+
+        // TODO: 3/10/17 remove this comment
+//        int indexOfInconsistentResult2 = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult2)).findFirst().get());
+        String firstInconsistentResult2 = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(tableInconsistentResult2)){
+                firstInconsistentResult2 = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfInconsistentResult2 = stringsFromReport
+                .indexOf(firstInconsistentResult2);
+
         int substringNotFound = -1;
 
         if (indexOfInconsistentResult1 != substringNotFound && indexOfInconsistentResult2 != substringNotFound) {
@@ -866,62 +921,101 @@ public class CreateNewOrderSteps2 {
         String tableSpecimenValidity = "SPECIMEN VALIDITY TESTING";
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
+        // TODO: 3/10/17 remove this comment
+//        int indexOfInconsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult)).findFirst().get());
+        String firstTableInconsistentResult = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(tableInconsistentResult)) {
+                firstTableInconsistentResult = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfInconsistentResult = stringsFromReport
+                .indexOf(firstTableInconsistentResult);
+        // TODO: 3/10/17 remove this comment
+//        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableSpecimenValidity)).findFirst().get());
+        String firstTableSpecimenValidity = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(tableSpecimenValidity)) {
+                firstTableSpecimenValidity = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfSpecimenValidity = stringsFromReport
+                .indexOf(firstTableSpecimenValidity);
 
-        int indexOfInconsistentResult = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableInconsistentResult)).findFirst().get());
-        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(tableSpecimenValidity)).findFirst().get());
         int substringNotFound = -1;
 
-        if (indexOfInconsistentResult != substringNotFound && indexOfSpecimenValidity != substringNotFound){
+        if (indexOfInconsistentResult != substringNotFound && indexOfSpecimenValidity != substringNotFound) {
             for (int i = indexOfInconsistentResult; i < indexOfSpecimenValidity; i++) {
-                if (stringsFromReport.get(i).contains("Compound1 ")){
+                if (stringsFromReport.get(i).contains("Compound1 ")) {
                     assertTrue(pdfOrder.getCompound1Result().equals(result));
                 }
             }
-        }else {
+        } else {
             log.info("One of the table doesn't exist!\n");
         }
     }
 
     @And("^Compound1 Conc. - <Value entered on Case Entry>$")
-    public void checkCompound1Concentration(){
+    public void checkCompound1Concentration() {
         assertTrue(pdfOrder.getCompound1Concentration().equals(webOrder.getCompound1Concentration()));
     }
 
     @And("^Compound1 Cutoff - <Value entered on Case Entry>$")
-    public void checkCompound1Cutoff(){
+    public void checkCompound1Cutoff() {
         assertTrue(pdfOrder.getCompound1Cutoff().equals(webOrder.getCompound1Cutoff()));
     }
 
     @And("^Compound1 Comments - \"([^\"]*)\"$")
-    public void checkCompound1Comments(String comments){
+    public void checkCompound1Comments(String comments) {
         assertTrue(pdfOrder.getCompound1Comments().equals(comments));
     }
 
     @When("^Verify the details displayed in \"([^\"]*)\" section Specimen Validity Testing.$")
-    public void verifyDetailsInSpecimenValidityTesting(String section){
+    public void verifyDetailsInSpecimenValidityTesting(String section) {
         assertTrue(pdfOrder.getContentFromReport().contains(section));
     }
 
     @Then("^Data entered in this section should be same as the data entered in 'Specimen Validity Testing' section during Case Entry.$")
-    public void checkAllDetailsInSpecimenValidity(){
+    public void checkAllDetailsInSpecimenValidity() {
         String specimenValidity = "SPECIMEN VALIDITY TESTING";
         String medication = "Medication(s) : ";
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-
-        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
-        int indexOfMedication = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        // TODO: 3/10/17 remove this comment
+//        int indexOfSpecimenValidity = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(specimenValidity)).findFirst().get());
+        String firstSpecimenValidity = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(specimenValidity)) {
+                firstSpecimenValidity = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfSpecimenValidity = stringsFromReport
+                .indexOf(firstSpecimenValidity);
+        // TODO: 3/10/17 remove this comment
+//        int indexOfMedication = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        String firstMedication = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(medication)) {
+                firstMedication = stringsFromReport.get(i);
+                break;
+            }
+        }
+        int indexOfMedication = stringsFromReport
+                .indexOf(firstMedication);
         int substringNotFound = -1;
 
-        if (indexOfSpecimenValidity != substringNotFound && indexOfMedication != substringNotFound){
+        if (indexOfSpecimenValidity != substringNotFound && indexOfMedication != substringNotFound) {
             for (int i = indexOfSpecimenValidity; i < indexOfMedication; i++) {
-                if (stringsFromReport.get(i).contains("Compound1")){
+                if (stringsFromReport.get(i).contains("Compound1")) {
                     assertTrue(pdfOrder.getvCompound1Result().equals(webOrder.getvCompound1Result()));
                     assertTrue(pdfOrder.getvCompound1ReferenceRange().equals(webOrder.getvCompound1ReferenceRange()));
                     assertTrue(pdfOrder.getvCompound1Concentration().equals(webOrder.getvCompound1Concentration()));
                     assertTrue(pdfOrder.getvCompound1Comments().equals(webOrder.getvCompound1Comments()));
                 }
-                if (stringsFromReport.get(i).contains("Compound2")){
+                if (stringsFromReport.get(i).contains("Compound2")) {
                     assertTrue(pdfOrder.getvCompound2Result().equals(webOrder.getvCompound2Result()));
                     assertTrue(pdfOrder.getvCompound2ReferenceRange().equals(webOrder.getvCompound2ReferenceRange()));
                     assertTrue(pdfOrder.getvCompound2Concentration().equals(webOrder.getvCompound2Concentration()));
@@ -932,39 +1026,59 @@ public class CreateNewOrderSteps2 {
     }
 
     @When("^Verify \"([^\"]*)\"$")
-    public void checkMedication(String section){
+    public void checkMedication(String section) {
         assertTrue(pdfOrder.getContentFromReport().contains(section));
     }
 
     @Then("^\"([^\"]*)\" should be displayed under 'Medications'.$")
-    public void checkDetailsInMedication(String typeOfMedication){
-       assertTrue(pdfOrder.getMedications().get(0).equals(typeOfMedication));
+    public void checkDetailsInMedication(String typeOfMedication) {
+        assertTrue(pdfOrder.getMedications().get(0).equals(typeOfMedication));
     }
 
-    /**Section with that name doesn't exist in pdf report!!!**/
+    /**
+     * Section with that name doesn't exist in pdf report!!!
+     **/
     @When("^Verify details from \"([^\"]*)\" section Test Screen Validation are displayed .$")
-    public void verifyTestScreenValidationSection(String section){
+    public void verifyTestScreenValidationSection(String section) {
 //        assertTrue(pdfOrder.getContentFromReport().contains(section));
-        try{
-            if (!pdfOrder.getContentFromReport().contains(section)){
+        try {
+            if (!pdfOrder.getContentFromReport().contains(section)) {
                 throw new PDFSectionNotFoundException("Section Test Screen Validation doesn't exist!");
             }
-        }catch (PDFSectionNotFoundException ignored){
+        } catch (PDFSectionNotFoundException ignored) {
             log.info(ignored + "\n");
         }
     }
 
     @Then("^Details from 'Test Screen Validation' section in the case entry should be displayed.$")
-    public void verifyDetailsInTestScreenValidationSection(){
+    public void verifyDetailsInTestScreenValidationSection() {
         String medication = "Medication(s) : ";
         String signedDate = "Signed Date:";
         String content = pdfOrder.getContentFromReport();
         List<String> stringsFromReport = Arrays.asList(content.split("\\r?\\n"));
-
+// TODO: 3/10/17 remove this comment
+//        int indexOfMedication = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+        String firstMedication = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(medication)) {
+                firstMedication = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfMedication = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(medication)).findFirst().get());
+                .indexOf(firstMedication);
+// TODO: 3/10/17 remove this comment
+//        int indexOfSignedDate = stringsFromReport.indexOf(stringsFromReport.stream().filter(e -> e.contains(signedDate)).findFirst().get());
+        String firstSignedDate = null;
+        for (int i = 0; i < stringsFromReport.size(); i++) {
+            if (stringsFromReport.get(i).contains(signedDate)) {
+                firstSignedDate = stringsFromReport.get(i);
+                break;
+            }
+        }
         int indexOfSignedDate = stringsFromReport
-                .indexOf(stringsFromReport.stream().filter(e -> e.contains(signedDate)).findFirst().get());
+                .indexOf(firstSignedDate);
+
         int substringNotFound = -1;
 
         if (indexOfMedication != substringNotFound && indexOfSignedDate != substringNotFound) {
@@ -1004,12 +1118,12 @@ public class CreateNewOrderSteps2 {
     }
 
     @When("^Verify Signature$")
-    public void verifySignature(){
+    public void verifySignature() {
         assertTrue(pdfOrder.isReportIsSigned());
     }
 
     @Then("^Signature of Pathologist along with Signed Date should be displayed.$")
-    public void verifySignedDate(){
+    public void verifySignedDate() {
         assertNotNull(pdfOrder.getSignedDate());
     }
 
@@ -1069,7 +1183,10 @@ public class CreateNewOrderSteps2 {
 
             File[] allFiles = dir.listFiles();
             if (allFiles != null && allFiles.length != 0) {
-                Arrays.stream(allFiles).forEach(File::delete);
+//                Arrays.stream(allFiles).forEach(File::delete);
+                for (int i = 0; i < allFiles.length; i++) {
+                    allFiles[i].delete();
+                }
             }
 
             if (dir.delete()) {

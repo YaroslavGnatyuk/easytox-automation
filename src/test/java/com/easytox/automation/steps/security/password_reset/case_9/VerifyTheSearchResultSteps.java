@@ -11,9 +11,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
@@ -91,8 +91,12 @@ public class VerifyTheSearchResultSteps {
         List<WebElement> elements = driver
                 .findElement(By.cssSelector(WElement.resultSearching))
                 .findElements(By.cssSelector(WElement.oneRowInResultSearching));
-        List<String> text = elements.stream().map(WebElement::getText).collect(Collectors.toList());
-
+        // TODO: 3/10/17 remove this comment
+//        List<String> text = elements.stream().map(WebElement::getText).collect(Collectors.toList());
+        List<String> text = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            text.add(elements.get(i).getText());
+        }
         assertTrue(text.contains(criteria.trim()));
     }
 
