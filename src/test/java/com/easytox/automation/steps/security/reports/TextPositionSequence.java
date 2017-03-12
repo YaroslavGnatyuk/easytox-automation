@@ -1,7 +1,7 @@
 package com.easytox.automation.steps.security.reports;
 
 
-import org.apache.pdfbox.util.TextPosition;
+import org.apache.pdfbox.text.TextPosition;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class TextPositionSequence implements CharSequence {
     public char charAt(int index)
     {
         TextPosition textPosition = textPositionAt(index);
-        String text = textPosition.getCharacter();
+        String text = textPosition.getUnicode();
         return text.charAt(0);
     }
 

@@ -1,29 +1,33 @@
 package com.easytox.automation.temp_tests;
 
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
+
+import com.easytox.automation.steps.security.reports.PDFOrder;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.assertTrue;
 
 public class SimpleTest {
-    List<String> brokenData = new ArrayList<>();
-    @Before
-    public void init(){
-        brokenData.add("POS");
-        brokenData.add("1");
-        brokenData.add("pos");
-    }
+    String path = "/home/yroslav/case#4/AA17-139.PDF";
+    PDFOrder pdf;
 
     @Test
     public void correctionData() {
-        if (brokenData.size()<4){
-            if (StringUtils.isNumeric(brokenData.get(0))){
-
-            }
+        pdf = new PDFOrder();
+        try {
+            PDDocument doc = PDDocument.load(new File(path));
+            pdf.setOrder(doc);
+            pdf.fillAllFields();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        assertTrue(pdf.isReportIsSigned());
+        assertTrue(pdf.isPositionOfLabNameAndLabAddressValid());
+
+        System.out.println(pdf.getSignedDate());
     }
 }

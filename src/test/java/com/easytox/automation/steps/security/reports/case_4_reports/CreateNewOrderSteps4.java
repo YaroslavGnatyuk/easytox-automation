@@ -1107,7 +1107,7 @@ public class CreateNewOrderSteps4 {
     private PDDocument downloadReport() {
         try {
             String reportPath = getPDFFile(downloadFilepath).getPath();
-            return PDDocument.load(reportPath);
+            return PDDocument.load(new File(reportPath));
         } catch (IOException e) {
             e.printStackTrace();
         }

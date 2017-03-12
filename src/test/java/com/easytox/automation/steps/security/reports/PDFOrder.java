@@ -1,18 +1,18 @@
 package com.easytox.automation.steps.security.reports;
 
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObject;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.TextPosition;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class PDFOrder extends Order {
     private PDDocument order;
@@ -49,7 +49,7 @@ public class PDFOrder extends Order {
             this.setMedication(stringFromReport);
             this.setValidationCompound1And2(content);
             this.setSignedDate(stringFromReport);
-            this.isReportSigned();
+            this.checkReportSignature();
         }
     }
 
@@ -69,19 +69,21 @@ public class PDFOrder extends Order {
         }
     }
 
-    private void isReportSigned() {
+    private void checkReportSignature() {
         try {
             PDFTextStripper parser = new PDFTextStripper();
             parser.setSortByPosition(true);
             parser.getText(order);
             PDPage page = parser.getCurrentPage();
             PDResources resources = page.getResources();
-            Map<String, PDXObject> images = resources.getXObjects();
-            if (!images.isEmpty()) {
+
+            Iterator<COSName> images = resources.getXObjectNames().iterator();
+            if (images.hasNext()) {
                 reportIsSigned = true;
             } else {
                 reportIsSigned = false;
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
